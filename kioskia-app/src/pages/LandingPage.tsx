@@ -1,9 +1,20 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDarkMode } from '../context/DarkModeContext'
+import { useAuth } from '../context/AuthContext'
 
 export default function LandingPage() {
     const navigate = useNavigate()
     const { darkMode, toggleDarkMode } = useDarkMode()
+    const { isAuthenticated, role, isLoading } = useAuth()
+
+    useEffect(() => {
+        if (isAuthenticated && !isLoading) {
+            if (role === 'student') navigate('/estudiante', { replace: true })
+            else if (role === 'parent') navigate('/padre', { replace: true })
+            else if (role === 'vendor') navigate('/vendedor', { replace: true })
+        }
+    }, [isAuthenticated, role, isLoading, navigate])
 
     const portals = [
         {
