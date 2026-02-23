@@ -6,7 +6,7 @@ export default function StudentDashboard() {
     const transactions = useTransactions({ limit: 8 })
     const summary = useSpendingSummary()
 
-    if (!profile) {
+    if (profile === undefined) {
         return (
             <div className="flex items-center justify-center py-20">
                 <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -14,7 +14,18 @@ export default function StudentDashboard() {
         )
     }
 
-    const unhealthyBalance = profile.balance - profile.healthyBalance
+    if (profile === null) {
+        return (
+            <div className="flex flex-col items-center justify-center py-20 text-center px-6">
+                <span className="material-icons-round text-5xl text-amber-500 mb-4">warning</span>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No se encontró tu perfil de estudiante</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Tu cuenta está autenticada pero no tiene un perfil de estudiante vinculado.</p>
+                <p className="text-xs text-gray-400 font-mono">Contacta al administrador para resolver este problema.</p>
+            </div>
+        )
+    }
+
+    const totalBalance = profile.generalBalance + profile.healthyBalance
     const savingsPercent = savingsGoal ? Math.min(100, Math.round((savingsGoal.currentAmount / savingsGoal.targetAmount) * 100)) : 0
 
     return (
@@ -34,8 +45,8 @@ export default function StudentDashboard() {
 
             {/* Balance Card */}
             <div className="bg-gradient-to-br from-primary via-primary-dark to-navy rounded-2xl p-6 text-white shadow-xl shadow-primary/20">
-                <p className="text-xs font-semibold uppercase tracking-widest text-white/70 mb-1">Mi Saldo</p>
-                <p className="text-4xl font-extrabold tracking-tight">${profile.balance.toLocaleString('es-CL')}</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-white/70 mb-1">Mi Saldo Total</p>
+                <p className="text-4xl font-extrabold tracking-tight">${totalBalance.toLocaleString('es-CL')}</p>
                 <div className="mt-4 grid grid-cols-2 gap-3">
                     <div className="bg-white/15 backdrop-blur-sm rounded-xl p-3">
                         <div className="flex items-center gap-2 mb-1">
@@ -47,14 +58,14 @@ export default function StudentDashboard() {
                     <div className="bg-white/15 backdrop-blur-sm rounded-xl p-3">
                         <div className="flex items-center gap-2 mb-1">
                             <span className="w-2.5 h-2.5 bg-amber-400 rounded-full" />
-                            <p className="text-[11px] font-semibold text-white/80">No Saludable</p>
+                            <p className="text-[11px] font-semibold text-white/80">General Libre</p>
                         </div>
-                        <p className="text-lg font-extrabold">${unhealthyBalance.toLocaleString('es-CL')}</p>
+                        <p className="text-lg font-extrabold">${profile.generalBalance.toLocaleString('es-CL')}</p>
                     </div>
                 </div>
                 <p className="mt-3 text-[10px] text-white/50 flex items-center gap-1">
                     <span className="material-icons-round text-xs">info</span>
-                    Puedes usar saldo no saludable para comprar comida saludable
+                    Puedes usar tu saldo general libre para cualquier tipo de compra
                 </p>
             </div>
 
@@ -141,6 +152,43 @@ export default function StudentDashboard() {
                     </div>
                 </div>
             )}
+
+            {/* Explora tu Mundo (Phase 3 Links) */}
+            <div className="space-y-3">
+                <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <span className="material-icons-round text-primary text-xl">explore</span>
+                    Explora tu Mundo
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                    <a href="/estudiante/educacion" className="bg-gradient-to-br from-yellow-300 to-orange-400 p-4 rounded-2xl text-white shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
+                        <div className="absolute -right-2 -top-2 text-white/20">
+                            <span className="material-icons-round" style={{ fontSize: '4rem' }}>school</span>
+                        </div>
+                        <p className="font-black text-lg leading-tight relative z-10">Aventura<br />Financiera</p>
+                    </a>
+
+                    <a href="/estudiante/planificador" className="bg-gradient-to-br from-green-400 to-emerald-500 p-4 rounded-2xl text-white shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
+                        <div className="absolute -right-2 -top-2 text-white/20">
+                            <span className="material-icons-round" style={{ fontSize: '4rem' }}>restaurant</span>
+                        </div>
+                        <p className="font-black text-lg leading-tight relative z-10">Arma tu<br />Combo</p>
+                    </a>
+
+                    <a href="/estudiante/logros" className="bg-gradient-to-br from-purple-400 to-pink-500 p-4 rounded-2xl text-white shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
+                        <div className="absolute -right-2 -top-2 text-white/20">
+                            <span className="material-icons-round" style={{ fontSize: '4rem' }}>emoji_events</span>
+                        </div>
+                        <p className="font-black text-lg leading-tight relative z-10">Mis<br />Medallas</p>
+                    </a>
+
+                    <a href="/estudiante/resumen" className="bg-gradient-to-br from-blue-400 to-indigo-500 p-4 rounded-2xl text-white shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
+                        <div className="absolute -right-2 -top-2 text-white/20">
+                            <span className="material-icons-round" style={{ fontSize: '4rem' }}>auto_awesome</span>
+                        </div>
+                        <p className="font-black text-lg leading-tight relative z-10">Año<br />Épico</p>
+                    </a>
+                </div>
+            </div>
 
             {/* Recent Transactions */}
             <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
