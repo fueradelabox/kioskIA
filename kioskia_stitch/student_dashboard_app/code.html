@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KioskIA - Student Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+            extend: {
+                colors: {
+                "primary": "#00c2a8",
+                "primary-dark": "#008f7a", 
+                "background-light": "#f5f8f8",
+                "background-dark": "#0f2320",
+                "navy-dark": "#1a2b4b",
+                "navy-light": "#2c4066"
+                },
+                fontFamily: {
+                "display": ["Inter", "sans-serif"]
+                },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+            },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-100 h-screen flex overflow-hidden">
+<!-- Desktop Sidebar Navigation (Visible on md+) -->
+<aside class="hidden md:flex flex-col w-64 h-full bg-white dark:bg-navy-dark border-r border-slate-200 dark:border-slate-700 shadow-sm z-20">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-xl">K</div>
+<span class="text-xl font-bold tracking-tight text-navy-dark dark:text-white">KioskIA</span>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-xl transition-colors" href="#">
+<span class="material-icons">home</span>
+<span class="font-medium">Inicio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors group" href="#">
+<span class="material-icons group-hover:text-primary transition-colors">savings</span>
+<span class="font-medium">Mi Ahorro</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors group" href="#">
+<span class="material-icons group-hover:text-primary transition-colors">history</span>
+<span class="font-medium">Historial</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors group" href="#">
+<span class="material-icons group-hover:text-primary transition-colors">person</span>
+<span class="font-medium">Perfil</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-100 dark:border-slate-700">
+<div class="flex items-center gap-3 px-4 py-2">
+<div class="relative">
+<img alt="User profile picture" class="w-10 h-10 rounded-full object-cover border-2 border-white dark:border-navy-dark shadow-sm" data-alt="Close up portrait of a young student smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5tWN7L2hm74djDB0ghWB9wSxsQuxTVXMkle-QSS81MIJTb_Hs_cqNhBHQgyogaEuuRSnhih3-q_rAR9HiHIYQn9J-DG-BLuJ_RsLtqW59lReE7yU7RbjbhfCck4YcAvSc8CbNrF5SmGwkbSsYEfe34s1wsYdCVjI8hMy_pvVAGh4Xj5FEE4go2O1ve-gtrKKf-fzRY_GBXw2rdRkkXwlnuEpFjvPFgtRfX6XuBiJLLSvCYS9Nkfj8T4A227hMXPxYt0PxPnlL900i"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-navy-dark rounded-full"></div>
+</div>
+<div>
+<p class="text-sm font-semibold text-slate-900 dark:text-white">Martín G.</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Estudiante</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 h-full overflow-y-auto relative">
+<!-- Mobile Header (Visible only on small screens) -->
+<header class="md:hidden sticky top-0 z-30 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-6 py-4 flex justify-between items-center">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-lg">K</div>
+<span class="font-bold text-lg text-navy-dark dark:text-white">KioskIA</span>
+</div>
+<button class="relative p-2 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-icons">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+</button>
+</header>
+<div class="max-w-5xl mx-auto p-6 md:p-10 space-y-8 pb-24 md:pb-10">
+<!-- Greeting Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+<div>
+<h1 class="text-3xl md:text-4xl font-bold text-navy-dark dark:text-white mb-1">
+                        ¡Hola, Martín! 👋
+                    </h1>
+<p class="text-slate-500 dark:text-slate-400">
+                        Veamos cómo van tus finanzas escolares hoy.
+                    </p>
+</div>
+<!-- Desktop Notification Bell -->
+<button class="hidden md:flex relative p-3 bg-white dark:bg-navy-dark text-slate-600 dark:text-slate-300 rounded-xl shadow-sm hover:shadow-md transition-all border border-slate-100 dark:border-slate-700">
+<span class="material-icons">notifications</span>
+<span class="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-navy-dark"></span>
+</button>
+</div>
+<!-- Dashboard Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+<!-- Left Column: Balance & Savings (Takes 7/12 on large screens) -->
+<div class="lg:col-span-7 space-y-6">
+<!-- Balance Card -->
+<div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-[#00b59c] to-primary-dark text-white shadow-lg p-6 md:p-8">
+<!-- Abstract Pattern Background -->
+<div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+<div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-navy-dark/10 rounded-full blur-2xl"></div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-2">
+<span class="text-primary-50 font-medium text-sm md:text-base">Saldo Total Disponible</span>
+<span class="material-icons text-white/80">account_balance_wallet</span>
+</div>
+<div class="flex items-baseline gap-1 mb-6">
+<span class="text-4xl md:text-5xl font-bold tracking-tight">$8.500</span>
+<span class="text-primary-100 font-medium">CLP</span>
+</div>
+<div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+<div class="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-4 py-2 flex items-center gap-3">
+<div class="bg-white text-primary p-1 rounded-full flex items-center justify-center">
+<span class="material-icons text-sm">local_dining</span>
+</div>
+<div>
+<p class="text-xs text-primary-50 uppercase tracking-wide font-semibold">Beca Alimentación</p>
+<p class="font-bold text-white">$6.000</p>
+</div>
+</div>
+<button class="w-full sm:w-auto bg-white text-primary hover:bg-primary-50 font-semibold py-2.5 px-6 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
+<span class="material-icons text-sm">add</span>
+                                    Cargar Saldo
+                                </button>
+</div>
+</div>
+</div>
+<!-- Savings Goal Card -->
+<div class="bg-white dark:bg-navy-dark rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-lg font-bold text-navy-dark dark:text-white flex items-center gap-2">
+<span class="material-icons text-yellow-500">emoji_events</span>
+                                Mi Meta de Ahorro
+                            </h2>
+<button class="text-sm text-primary hover:text-primary-dark font-medium">Editar Meta</button>
+</div>
+<div class="flex flex-col sm:flex-row gap-6 items-center">
+<div class="shrink-0 relative group cursor-pointer">
+<div class="w-24 h-24 sm:w-32 sm:h-32 rounded-xl bg-slate-50 dark:bg-slate-800 p-2 flex items-center justify-center border-2 border-slate-100 dark:border-slate-600 group-hover:border-primary/30 transition-colors">
+<!-- Use a placeholder image representing a console/gadget -->
+<img alt="Goal Item" class="w-full h-full object-cover rounded-lg mix-blend-multiply dark:mix-blend-normal" data-alt="Handheld gaming console with colorful buttons" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBty7kS-_ZbT__C4Rdd-5JYEr7iBJ7QMKM938AX_8zgBbl7f5W_iUGYP_qjN40WVQiF7ZZ_67IsKnj9EZhTZKyFfm0NWDZVeeIjyG0oTdidaxjEOOJXpVhUWnDfYqRrUKD8tl4lAGpS1f0QStviObuXuGR646bzN3DDpKe3xpKG226imp-SUnMCbyxWIoJAS37iH5URTNIGT2lbq4ByJPxJh6ZqhwNPyTpYjWH4AAYHRRIGAZjfX6RM5s1Yyf5H6-QHbTeh_A-_amiw"/>
+</div>
+</div>
+<div class="flex-1 w-full space-y-4">
+<div class="flex justify-between items-end">
+<div>
+<h3 class="font-bold text-lg text-slate-800 dark:text-white mb-1">Nintendo Switch</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Ahorro para mi consola</p>
+</div>
+<div class="text-right">
+<span class="text-2xl font-bold text-primary">$20.000</span>
+<span class="text-sm text-slate-400"> / $250.000</span>
+</div>
+</div>
+<div class="relative h-4 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-primary rounded-full transition-all duration-1000 ease-out" style="width: 8%;"></div>
+</div>
+<div class="flex justify-between items-center text-xs font-medium text-slate-500 dark:text-slate-400">
+<span>8% Completado</span>
+<span>Faltan $230.000</span>
+</div>
+<button class="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 rounded-xl transition-all shadow-md shadow-primary/20 flex items-center justify-center gap-2 mt-2">
+<span class="material-icons text-sm">savings</span>
+                                    Ahorrar Ahora
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Recent Transactions (Takes 5/12 on large screens) -->
+<div class="lg:col-span-5">
+<div class="bg-white dark:bg-navy-dark rounded-2xl h-full p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-lg font-bold text-navy-dark dark:text-white">Últimas Compras</h2>
+<a class="text-sm text-primary hover:text-primary-dark font-medium flex items-center" href="#">
+                                Ver todo <span class="material-icons text-sm ml-1">chevron_right</span>
+</a>
+</div>
+<div class="space-y-4">
+<!-- Transaction Item 1: Healthy -->
+<div class="group flex items-center justify-between p-3 -mx-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 flex items-center justify-center shrink-0">
+<span class="material-icons">nutrition</span>
+</div>
+<div>
+<h4 class="font-semibold text-slate-800 dark:text-slate-100">Manzana Verde</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+<span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span> Saludable • Hoy, 10:30 AM
+                                        </p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-red-500 dark:text-red-400">-$500</p>
+</div>
+</div>
+<!-- Transaction Item 2: Drink -->
+<div class="group flex items-center justify-between p-3 -mx-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0">
+<span class="material-icons">local_drink</span>
+</div>
+<div>
+<h4 class="font-semibold text-slate-800 dark:text-slate-100">Jugo Natural</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+<span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span> Saludable • Ayer, 13:15 PM
+                                        </p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-red-500 dark:text-red-400">-$1.200</p>
+</div>
+</div>
+<!-- Transaction Item 3: Treat -->
+<div class="group flex items-center justify-between p-3 -mx-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+<span class="material-icons">cookie</span>
+</div>
+<div>
+<h4 class="font-semibold text-slate-800 dark:text-slate-100">Súper 8</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+<span class="w-2 h-2 bg-slate-400 rounded-full inline-block"></span> Snack • 12 Oct
+                                        </p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-red-500 dark:text-red-400">-$400</p>
+</div>
+</div>
+<!-- Transaction Item 4: Stationery -->
+<div class="group flex items-center justify-between p-3 -mx-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+<span class="material-icons">edit</span>
+</div>
+<div>
+<h4 class="font-semibold text-slate-800 dark:text-slate-100">Lápiz Pasta</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+<span class="w-2 h-2 bg-slate-400 rounded-full inline-block"></span> Útiles • 10 Oct
+                                        </p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-red-500 dark:text-red-400">-$650</p>
+</div>
+</div>
+</div>
+<!-- Mini Education Tip -->
+<div class="mt-8 bg-primary/10 rounded-xl p-4 flex items-start gap-3">
+<span class="material-icons text-primary mt-0.5">lightbulb</span>
+<div>
+<h5 class="text-sm font-bold text-primary-dark dark:text-primary">Tip Financiero</h5>
+<p class="text-xs text-slate-600 dark:text-slate-300 mt-1">Si ahorras $1.000 diarios, alcanzarás tu meta 2 meses antes.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Mobile Bottom Navigation (Visible only on md and below) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-navy-dark border-t border-slate-200 dark:border-slate-700 pb-safe z-40">
+<div class="flex justify-around items-center h-16">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-icons">home</span>
+<span class="text-[10px] font-medium">Inicio</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" href="#">
+<span class="material-icons">savings</span>
+<span class="text-[10px] font-medium">Mi Ahorro</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" href="#">
+<span class="material-icons">history</span>
+<span class="text-[10px] font-medium">Historial</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" href="#">
+<span class="material-icons">person</span>
+<span class="text-[10px] font-medium">Perfil</span>
+</a>
+</div>
+</nav>
+<!-- Safe area padding for iPhone home indicator -->
+<style>
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+<script>
+        // Simple script to demonstrate dark mode toggling if desired, 
+        // though not explicitly requested in functionality, it helps visualize theme.
+        // For now, it respects the system or manual class addition.
+    </script>
+</body></html>

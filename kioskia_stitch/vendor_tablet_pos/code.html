@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KioskIA Vendor POS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#00c2a8",
+                        "primary-dark": "#009e89",
+                        "background-light": "#f5f8f8",
+                        "background-dark": "#0f2320",
+                        "neutral-light": "#e0e6e6",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for touch feel */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        .fingerprint-ring::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; right: 0; bottom: 0;
+            border-radius: 50%;
+            border: 2px solid #00c2a8;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display h-screen flex flex-col overflow-hidden">
+<!-- Top Bar -->
+<header class="h-16 bg-white dark:bg-[#16302c] border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6 shrink-0 z-20">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center text-primary">
+<span class="material-icons-round">storefront</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white">KioskIA <span class="text-primary font-normal">POS</span></h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="text-right hidden md:block">
+<p class="text-sm font-semibold text-gray-900 dark:text-white" id="clock">12:45 PM</p>
+<p class="text-xs text-gray-500 dark:text-gray-400">Turno Almuerzo</p>
+</div>
+<div class="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden border-2 border-white dark:border-gray-600 shadow-sm">
+<img alt="Cashier" class="w-full h-full object-cover" data-alt="Portrait of cashier staff member" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAq39Z__TDJipcR3w2wWiFShWf7i5c9vitlMXdfu8P2mjXo3e7T7zA_BmRmZqrHHgpezBvPJWJ5Ky9svhPSa_sSa5-1fqQclTdJYRDznHRoW4WXeK7wYyZk_DQkgIsb9dD-kTxUdVZcUkM1-RnzammqhM7F_6QJv3Dq2XPbkEBzgpNgox-b7whUzouAPgHtPRR2d74bALGWC4dsdfGuCNDZs877Lg7z4pJ9MDOXKvgM96GirrQoMf_JKIL7UkTgjbuSPL2dxQxRqr-P"/>
+</div>
+</div>
+</header>
+<!-- Main Content Grid -->
+<main class="flex-1 grid grid-cols-12 gap-0 overflow-hidden">
+<!-- LEFT COLUMN: Product Catalog (5 cols) -->
+<section class="col-span-12 lg:col-span-5 flex flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-[#16302c]/50 relative">
+<!-- Search & Filters -->
+<div class="p-4 space-y-3 bg-white dark:bg-[#16302c] shadow-sm z-10">
+<div class="relative">
+<span class="material-icons-round absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+<input class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border-none rounded-xl focus:ring-2 focus:ring-primary text-sm" placeholder="Buscar producto..." type="text"/>
+</div>
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+<button class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg whitespace-nowrap shadow-sm shadow-primary/30">Todo</button>
+<button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 text-sm font-medium rounded-lg whitespace-nowrap transition-colors">Snacks</button>
+<button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 text-sm font-medium rounded-lg whitespace-nowrap transition-colors">Bebidas</button>
+<button class="px-4 py-2 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/50 text-sm font-medium rounded-lg whitespace-nowrap flex items-center gap-1 transition-colors">
+<span class="material-icons-round text-xs">eco</span> Saludable
+                    </button>
+</div>
+</div>
+<!-- Grid -->
+<div class="flex-1 overflow-y-auto p-4 bg-gray-50/50 dark:bg-transparent">
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+<!-- Product Card 1 -->
+<div class="group bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:border-primary dark:hover:border-primary hover:shadow-md transition-all relative overflow-hidden">
+<div class="absolute top-2 right-2 z-10">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+<span class="material-icons-round text-[10px] mr-1">eco</span>Eco
+                            </span>
+</div>
+<div class="aspect-square rounded-lg bg-gray-100 mb-3 overflow-hidden">
+<img alt="Manzana" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Red apple fresh fruit" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXQ_QfK_W8tG5njvEEih4XfKWDFtQCbRJJsZSFLXKesPllBnvGzBU-rHyWMKPVXMS8iRaHsMTM7Toxer6Xc2MG3Sd8t6DRHtLb7JHXDZ92gWj8vvwwziuGi0d2KAnXYong1uo130ko6qKn5CL9OqiFhjyM1MzbtUW9dlXcuazp5k2rGFC1siKNyLUh-JfHExnaFj-E2_cwr4uEpBWPT6yv3Ks1RF9dmx9lSoRDRgBpaJMtJbn8VtxkKbgkGbRSAAKUPYnC7cu6264e"/>
+</div>
+<h3 class="font-medium text-gray-900 dark:text-white text-sm leading-tight mb-1">Manzana Roja</h3>
+<p class="text-primary font-bold">$500</p>
+</div>
+<!-- Product Card 2 -->
+<div class="group bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:border-primary dark:hover:border-primary hover:shadow-md transition-all relative">
+<div class="absolute top-2 right-2 z-10">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+<span class="material-icons-round text-[10px] mr-1">eco</span>Eco
+                            </span>
+</div>
+<div class="aspect-square rounded-lg bg-gray-100 mb-3 overflow-hidden">
+<img alt="Jugo Natural" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Natural orange juice glass bottle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrt7vCCObZtkZRYzzpJFSG_MnY0BqaUIg8TebEknATtqum2yITHxWi36gXpwiqw4usyyBWKlsC03pNByo6ULf2IkBQvV3FHgmJ8ajq4ezBwUuPmt-gwr2I56XaeoU4LVRQeIopdWlgLknm5mZfjOCWjVpnuQvXwaGIt4YJB6fgk1vjexfiIhoua88CepBW6LydTETDe3CQun4DYSqcBzJlP1ZVv0DEYs0hEPINO-N6jjcAArLTAxbzZ8Apyvjt32oUgp5DZgh44Rpp"/>
+</div>
+<h3 class="font-medium text-gray-900 dark:text-white text-sm leading-tight mb-1">Jugo Naranja</h3>
+<p class="text-primary font-bold">$1.200</p>
+</div>
+<!-- Product Card 3 -->
+<div class="group bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:border-primary dark:hover:border-primary hover:shadow-md transition-all relative">
+<div class="absolute top-2 right-2 z-10">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">
+<span class="material-icons-round text-[10px] mr-1">warning</span>Alto
+                            </span>
+</div>
+<div class="aspect-square rounded-lg bg-gray-100 mb-3 overflow-hidden">
+<img alt="Galleta" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Chocolate chip cookie close up" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPidpaZp5Zpy9cCUDlKEsMnI1hKIv6WhZcqqON9pti0a7tHjZycK1wVvr0uZiQTU1Jbwgrpo5BBGond7qXBhH3uoNMsE1rCET-pi7lFWjTJnrtruDsh-Dvs_kFYTE_FfMQ2RNQHS8GBq69bKsYSNYc54EH588FSZQiDQjZn0idhWLn49CfdhIZwTVBjLmYgNdXTzzhWAl5GEK6s28gv2V43AALiBpzlj8eQRwo4flKl2ieADZs_6rZkMGti7T3PSqpxQxmxTGZUKSa"/>
+</div>
+<h3 class="font-medium text-gray-900 dark:text-white text-sm leading-tight mb-1">Cookie Choco</h3>
+<p class="text-primary font-bold">$800</p>
+</div>
+<!-- Product Card 4 -->
+<div class="group bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:border-primary dark:hover:border-primary hover:shadow-md transition-all relative">
+<div class="absolute top-2 right-2 z-10">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+<span class="material-icons-round text-[10px] mr-1">eco</span>Eco
+                            </span>
+</div>
+<div class="aspect-square rounded-lg bg-gray-100 mb-3 overflow-hidden">
+<img alt="Yogurt" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Fresh yogurt cup with granola" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAln8bvLZQr99rTwi9mi5K0YZhcRkNDYvAtZVZmjr_FXy3pf68-9DdiZASsoXwMgyB-feMZNobtK64C8OJ84NMKppCNwwoUdPf011TIxckOLoU1vd0pkwcYDdNOg7jUrILAB4wEqNo-h_AUV4w51NMw83v5B7iLSLMDs5qcszQl5QNYgKP-NC6T5ZzjGf-OL42oUuA3cotTUX6ap2wIjUcvwPG0K6E_FIQJXzJPnIefPC-oJw0QL64GfftJE73kkU3TugEnZZpRkrPN"/>
+</div>
+<h3 class="font-medium text-gray-900 dark:text-white text-sm leading-tight mb-1">Yogurt Granola</h3>
+<p class="text-primary font-bold">$950</p>
+</div>
+<!-- Product Card 5 -->
+<div class="group bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:border-primary dark:hover:border-primary hover:shadow-md transition-all relative">
+<div class="absolute top-2 right-2 z-10">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">
+<span class="material-icons-round text-[10px] mr-1">warning</span>Alto
+                            </span>
+</div>
+<div class="aspect-square rounded-lg bg-gray-100 mb-3 overflow-hidden">
+<img alt="Soda" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Can of soda with condensation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLqk_aegeVxceS9_oUHHNcnhhXfpcgpEboSWdJ1RSPjHAPJbduOsAC8OSDJgO5bPaa_REbOILG_TxxAyrIdqqAWusRN3vQeAPLTkA0EwJjYxvqocgLDfMMANFme1aQG7scyGvGsh-isBrG8b_b7xNo8DxFZAXV9O4bC6yK7Htu3VfqwzT3xoreqV6IlD5criHHrhP2Yst7KnfX-MoqqYtYoPFd87V-Vra8kiojwU9oiZKh1CdV_FsJop4dcUvUbnWNfb1h6b-Y1eKy"/>
+</div>
+<h3 class="font-medium text-gray-900 dark:text-white text-sm leading-tight mb-1">Bebida Lata</h3>
+<p class="text-primary font-bold">$1.000</p>
+</div>
+<!-- Product Card 6 -->
+<div class="group bg-white dark:bg-gray-800 rounded-xl p-3 shadow-sm border border-gray-100 dark:border-gray-700 cursor-pointer hover:border-primary dark:hover:border-primary hover:shadow-md transition-all relative">
+<div class="absolute top-2 right-2 z-10">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+<span class="material-icons-round text-[10px] mr-1">eco</span>Eco
+                            </span>
+</div>
+<div class="aspect-square rounded-lg bg-gray-100 mb-3 overflow-hidden">
+<img alt="Barra Cereal" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="Cereal bar snack packaging" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC59HvVPKlfnQg9JRirEEH0yeTU3V7gmlkNlH7pbhSxJV_OR_Z1TkCoZbRMpozpb6mw9j1O4Zk83d6qY0WzwVyMrXVSr13A-NWUfYOFc7zz0pdVurDgMU761k_qKUxtHEODIDfPRA5om6_du5rQIZhZD1oXWF51-fzrMillZSPsfWhmFjixoxPwhPL30ZCTSNK3CmCU-rI4D7STrUImfzJFSjt4cZHt1B9llkJJecygHUv5wrVALcdpfajHVl_0HRJgi80r7wYb0CZV"/>
+</div>
+<h3 class="font-medium text-gray-900 dark:text-white text-sm leading-tight mb-1">Barra Cereal</h3>
+<p class="text-primary font-bold">$400</p>
+</div>
+</div>
+</div>
+</section>
+<!-- CENTER COLUMN: Shopping Cart (4 cols) -->
+<section class="col-span-12 lg:col-span-4 flex flex-col bg-background-light dark:bg-background-dark border-r border-gray-200 dark:border-gray-700 relative z-10">
+<!-- Header -->
+<div class="p-4 bg-white dark:bg-[#16302c] border-b border-gray-200 dark:border-gray-700 flex justify-between items-center shadow-sm">
+<h2 class="font-semibold text-lg text-gray-800 dark:text-gray-100">Orden Actual</h2>
+<button class="text-xs font-medium text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 px-3 py-1.5 rounded transition-colors">
+                    Limpiar
+                </button>
+</div>
+<!-- Cart Items -->
+<div class="flex-1 overflow-y-auto p-4 space-y-3">
+<!-- Item 1 -->
+<div class="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-transparent hover:border-primary/30 transition-all">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Red apple small thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYQr0O5zySeJ9hRtEFREGbo8U8BOyqNMY4RHgfVZGfet-HLhG3tlF5-JPtrtwl0Ct6TL6BBJs74lwp-_HNTMGeeW-EtQSMGrUJY5k4sDjQoRqwdykubNxme-0C74svr0t1I77YY8yef68Q0YmqeO1kCutHwi7yyOI21UkyslPHxWElfGzuhR4X3TSyJGNq2SZSoCvYot30KVg29TqlMJtu619W8zGzVwS3BVDq9EfRTI6wer6lsLJrUoL7NfJeY15jADA4AQ_Gpa6s"/>
+</div>
+<div>
+<h4 class="font-medium text-sm text-gray-900 dark:text-white">Manzana Roja</h4>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="text-xs text-primary font-bold">$500</span>
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-1">
+<button class="w-8 h-8 flex items-center justify-center rounded-md bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 shadow-sm hover:text-primary active:scale-95 transition-all">
+<span class="material-icons-round text-sm">remove</span>
+</button>
+<span class="font-semibold text-sm w-4 text-center">2</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-md bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 shadow-sm hover:text-primary active:scale-95 transition-all">
+<span class="material-icons-round text-sm">add</span>
+</button>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-transparent hover:border-primary/30 transition-all">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Chocolate cookie small thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_xUlKGIcDQCTs24V6UKZBw3C0nUTKlYEPziVibjWbxmTcm08ECev7wySiC_fxCHXPUKcbGocsRCMK6NJQiEhuJ61FSl-3Y6MpmSemJ0ChPbYQa69AWoGvaPDQcnqcWOCSTltym-QE_QQFAjWf0qJbUMMeuBxpDfEcAoNphWC5ZBI2OfKjOy7WL7GgNFADUCN9TSLFY-6cpSSLjRsbKvux9o0ctVXDnju-tH3K2t_nc82N2UorOj59edn2YvIx5S6n7ymy_ss9hHpa"/>
+</div>
+<div>
+<h4 class="font-medium text-sm text-gray-900 dark:text-white">Cookie Choco</h4>
+<div class="flex items-center gap-2 mt-0.5">
+<span class="text-xs text-primary font-bold">$800</span>
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-1">
+<button class="w-8 h-8 flex items-center justify-center rounded-md bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 shadow-sm hover:text-primary active:scale-95 transition-all">
+<span class="material-icons-round text-sm">remove</span>
+</button>
+<span class="font-semibold text-sm w-4 text-center">1</span>
+<button class="w-8 h-8 flex items-center justify-center rounded-md bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 shadow-sm hover:text-primary active:scale-95 transition-all">
+<span class="material-icons-round text-sm">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Nutritional & Financial Summary -->
+<div class="p-4 bg-white dark:bg-[#16302c] border-t border-gray-200 dark:border-gray-700 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<!-- Health Breakdown -->
+<div class="flex gap-2 mb-4">
+<div class="flex-1 bg-green-50 dark:bg-green-900/20 rounded-lg p-2 flex items-center justify-center gap-2 border border-green-100 dark:border-green-900/30">
+<span class="material-icons-round text-green-600 dark:text-green-400 text-sm">eco</span>
+<span class="text-xs font-semibold text-green-700 dark:text-green-300">2 Saludables</span>
+</div>
+<div class="flex-1 bg-amber-50 dark:bg-amber-900/20 rounded-lg p-2 flex items-center justify-center gap-2 border border-amber-100 dark:border-amber-900/30">
+<span class="material-icons-round text-amber-600 dark:text-amber-400 text-sm">warning</span>
+<span class="text-xs font-semibold text-amber-700 dark:text-amber-300">1 "Sellos"</span>
+</div>
+</div>
+<!-- Totals -->
+<div class="space-y-1 mb-2">
+<div class="flex justify-between text-sm text-gray-500 dark:text-gray-400">
+<span>Subtotal</span>
+<span>$1.800</span>
+</div>
+<div class="flex justify-between items-center pt-2">
+<span class="font-bold text-gray-900 dark:text-white text-lg">Total a Pagar</span>
+<span class="font-bold text-primary text-2xl">$1.800</span>
+</div>
+</div>
+</div>
+</section>
+<!-- RIGHT COLUMN: Authentication & Payment (3 cols) -->
+<section class="col-span-12 lg:col-span-3 flex flex-col bg-gray-50 dark:bg-[#112724] relative">
+<div class="flex-1 flex flex-col p-6">
+<!-- Authentication Status Area -->
+<div class="flex-1 flex flex-col items-center justify-center space-y-6">
+<!-- Authenticated User View (Simulated Active State) -->
+<div class="w-full bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 text-center animate-fade-in-up">
+<div class="w-20 h-20 rounded-full bg-primary/10 mx-auto mb-3 p-1">
+<img class="w-full h-full object-cover rounded-full" data-alt="Student portrait photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCILG8R4B8KJWatCOfV0E4pKpbwS9j6ZTH6dwHgCS4TYdO5ttm3TJI25qeRZJ0Zx7fEOh7Wn1EtvNAish3AA5u9ZhR46_gFZOZ9h_PI1zsDtJxMCcyO6BHp-SgFwKgqvjNPkKpAYFK2IOazMHP2zlyWh-AAbeppjGLA3FOK7vhekzBkBi5IEcyOHX9aijHm3F_5CQ0Heeyku8XdH5ONyG_2xP2TInlraEY8A01j5K5l1kpOvURa_aiBpvScq7pB0D0oXkH2Plrl5aJ5"/>
+</div>
+<h3 class="font-bold text-lg text-gray-900 dark:text-white">Juan Pérez</h3>
+<p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">4° Básico A</p>
+<div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg py-2 mb-4">
+<p class="text-xs text-gray-500 dark:text-gray-400">Saldo Disponible</p>
+<p class="text-xl font-bold text-primary">$15.000</p>
+</div>
+<!-- Validation Message -->
+<div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-lg p-3 text-left flex gap-3">
+<span class="material-icons-round text-amber-500 mt-0.5 shrink-0">info</span>
+<div>
+<p class="text-xs font-bold text-amber-800 dark:text-amber-200">Atención</p>
+<p class="text-[11px] leading-tight text-amber-700 dark:text-amber-300 mt-0.5">Alumno con límite diario de azúcar. Este producto "Cookie" consume el 80% de su cuota.</p>
+</div>
+</div>
+</div>
+<!-- OR Divider -->
+<div class="w-full flex items-center gap-2 opacity-50">
+<div class="h-px bg-gray-300 dark:bg-gray-600 flex-1"></div>
+<span class="text-xs text-gray-400 font-medium">AUTENTICACIÓN</span>
+<div class="h-px bg-gray-300 dark:bg-gray-600 flex-1"></div>
+</div>
+<!-- Idle State: Fingerprint Animation -->
+<div class="relative w-24 h-24 flex items-center justify-center">
+<div class="absolute w-full h-full rounded-full border border-primary/30 fingerprint-ring"></div>
+<button class="relative z-10 w-16 h-16 bg-white dark:bg-gray-800 rounded-full shadow-md flex items-center justify-center text-primary hover:scale-105 transition-transform">
+<span class="material-icons-round text-4xl">fingerprint</span>
+</button>
+</div>
+<button class="flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full justify-center">
+<span class="material-icons-round">qr_code_scanner</span>
+                        Escanear Código QR
+                    </button>
+</div>
+</div>
+<!-- Bottom Action Area -->
+<div class="p-6 bg-white dark:bg-[#16302c] border-t border-gray-200 dark:border-gray-700">
+<button class="w-full bg-primary hover:bg-primary-dark text-white font-bold text-lg py-4 px-6 rounded-xl shadow-lg shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group">
+<span>Confirmar Compra</span>
+<span class="material-icons-round group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<p class="text-center text-xs text-gray-400 mt-3">Transacción segura y encriptada</p>
+</div>
+</section>
+</main>
+</body></html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KioskIA - Crear Meta de Ahorro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+            extend: {
+                colors: {
+                "primary": "#00c2a8",
+                "background-light": "#f5f8f8",
+                "background-dark": "#0f2320",
+                },
+                fontFamily: {
+                "display": ["Inter", "sans-serif"]
+                },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+            },
+        }
+    </script>
+<style>
+        /* Custom styles for range slider thumb to match theme */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #00c2a8;
+            cursor: pointer;
+            margin-top: -8px; 
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Navigation Bar -->
+<nav class="sticky top-0 z-50 bg-white/80 dark:bg-[#0f2320]/80 backdrop-blur-md border-b border-primary/10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between h-16 items-center">
+<div class="flex items-center gap-2">
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-icons text-primary">savings</span>
+</div>
+<span class="font-bold text-xl tracking-tight text-slate-900 dark:text-white">KioskIA</span>
+</div>
+<div class="flex items-center space-x-4">
+<div class="hidden md:flex items-center space-x-1 bg-primary/5 px-3 py-1 rounded-full">
+<span class="text-sm font-medium text-primary">Saldo Actual:</span>
+<span class="text-sm font-bold text-slate-900 dark:text-white">$12.500</span>
+</div>
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-primary/20 transition-colors">
+<span class="material-icons text-slate-500 dark:text-primary/70">notifications</span>
+</button>
+<div class="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border border-primary/30">
+<img alt="Profile" class="h-full w-full object-cover" data-alt="Portrait of a young student smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArOIZxWfq5W3DMPLRxO6ebQ5cUIwM7CoXA_QzroWK_XD4sXHTRel6yw951h5lYU1dXQBtHJJ09u0rXm6yWZa64gtBydd8_o0kn4daG2s1d0qMyiCns1n1G07A7EAnfZ6C1aEM7dC0-nY1Xii7wynm9QCV7hvqkmHwN7FmGBwH8s00UkozryqH0P4mnQvbJiN_uT5yMNm5kK7368zvY_rn0GeV8c7mZQlpCEqGqXF2b0MsBKslERjkJP90KrnHPo9WxtNInGKkh0LlH"/>
+</div>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow container mx-auto px-4 py-8 sm:px-6 lg:px-8 max-w-6xl">
+<!-- Header Section -->
+<div class="mb-10 text-center max-w-2xl mx-auto">
+<h1 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-3">Crear Nueva Meta</h1>
+<p class="text-slate-500 dark:text-slate-400 text-lg">Define tu próximo objetivo y comienza a ahorrar hoy mismo. ¡Tú puedes lograrlo!</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left Column: Form -->
+<div class="lg:col-span-7 space-y-6">
+<!-- Card: Form Container -->
+<div class="bg-white dark:bg-[#162e2a] rounded-xl shadow-sm border border-slate-100 dark:border-primary/10 p-6 md:p-8">
+<form class="space-y-6" onsubmit="event.preventDefault();">
+<!-- Goal Name Input -->
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-slate-700 dark:text-slate-200" for="goalName">
+                                ¿Qué quieres comprar?
+                            </label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-icons text-slate-400 text-xl">shopping_bag</span>
+</div>
+<input class="block w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-primary/5 border border-slate-200 dark:border-primary/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-slate-900 dark:text-white placeholder-slate-400 transition-all" id="goalName" placeholder="Ej: Bicicleta Nueva, Entradas al Cine..." type="text"/>
+</div>
+</div>
+<!-- Amount Input -->
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-slate-700 dark:text-slate-200" for="goalAmount">
+                                ¿Cuánto cuesta?
+                            </label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="text-slate-500 font-bold text-lg">$</span>
+</div>
+<input class="block w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-primary/5 border border-slate-200 dark:border-primary/20 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-slate-900 dark:text-white placeholder-slate-400 transition-all font-mono text-lg" id="goalAmount" placeholder="0" type="number"/>
+<div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+<span class="text-slate-400 text-sm">CLP</span>
+</div>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400">Te recomendamos metas realistas para empezar.</p>
+</div>
+<!-- Image Upload (Drag & Drop) -->
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                Sube una foto de tu meta
+                            </label>
+<div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 dark:border-primary/30 border-dashed rounded-xl hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group">
+<div class="space-y-1 text-center">
+<div class="mx-auto h-12 w-12 text-slate-400 group-hover:text-primary transition-colors">
+<span class="material-icons text-5xl">add_photo_alternate</span>
+</div>
+<div class="flex text-sm text-slate-600 dark:text-slate-300 justify-center">
+<label class="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary" for="file-upload">
+<span>Sube un archivo</span>
+<input class="sr-only" id="file-upload" name="file-upload" type="file"/>
+</label>
+<p class="pl-1">o arrastra y suelta</p>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400">
+                                        PNG, JPG, GIF hasta 5MB
+                                    </p>
+</div>
+</div>
+</div>
+<!-- Tip Box -->
+<div class="bg-primary/10 dark:bg-primary/5 rounded-lg p-4 flex gap-3 border border-primary/20">
+<span class="material-icons text-primary">lightbulb</span>
+<div>
+<h4 class="font-semibold text-primary text-sm">Tip de Ahorro</h4>
+<p class="text-sm text-slate-600 dark:text-slate-300">Es más fácil ahorrar cuando tienes una imagen clara de lo que quieres. ¡Visualiza tu éxito!</p>
+</div>
+</div>
+<!-- Action Buttons Mobile (Hidden on Desktop, shown on mobile for better reach) -->
+<div class="flex flex-col gap-3 pt-4 lg:hidden">
+<button class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-bold text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors" type="submit">
+                                Crear Mi Meta
+                            </button>
+<button class="w-full flex justify-center py-3 px-4 border border-slate-200 dark:border-primary/30 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-transparent hover:bg-slate-50 dark:hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors" type="button">
+                                Cancelar
+                            </button>
+</div>
+</form>
+</div>
+</div>
+<!-- Right Column: Live Preview & Desktop Actions -->
+<div class="lg:col-span-5 flex flex-col gap-6 sticky top-24">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-icons text-slate-400 text-sm">visibility</span>
+<h3 class="text-sm font-bold text-slate-500 uppercase tracking-wider">Vista Previa</h3>
+</div>
+<!-- Preview Card -->
+<div class="bg-white dark:bg-[#162e2a] rounded-xl overflow-hidden shadow-lg border border-slate-100 dark:border-primary/10 transform transition-transform hover:scale-[1.02] duration-300">
+<!-- Image Area -->
+<div class="h-48 bg-slate-100 dark:bg-primary/10 w-full relative flex items-center justify-center overflow-hidden">
+<!-- Placeholder State (Visible when no image) -->
+<div class="absolute inset-0 flex flex-col items-center justify-center text-slate-300 dark:text-primary/30">
+<span class="material-icons text-6xl">image</span>
+<span class="text-sm font-medium">Tu imagen aparecerá aquí</span>
+</div>
+<!-- Use a generic motivating gradient as placeholder bg -->
+<div class="absolute inset-0 bg-gradient-to-tr from-primary/10 to-blue-500/10 opacity-50"></div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white line-clamp-1" id="previewTitle">Tu Meta...</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Creada el 14 Oct 2023</p>
+</div>
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-icons text-primary">flag</span>
+</div>
+</div>
+<!-- Progress Section -->
+<div class="space-y-2 mb-6">
+<div class="flex justify-between text-sm font-medium">
+<span class="text-slate-600 dark:text-slate-300">$0</span>
+<span class="text-slate-900 dark:text-white font-bold">$0</span>
+</div>
+<!-- Progress Bar -->
+<div class="w-full bg-slate-100 dark:bg-black/20 rounded-full h-3 overflow-hidden">
+<div class="bg-primary h-3 rounded-full" style="width: 5%"></div>
+</div>
+<div class="flex justify-between text-xs text-slate-400">
+<span>0% completado</span>
+<span>¡Falta poco!</span>
+</div>
+</div>
+<div class="bg-slate-50 dark:bg-primary/5 rounded-lg p-3 text-center border border-dashed border-slate-200 dark:border-primary/20">
+<p class="text-sm text-primary font-medium">✨ ¡Tú puedes lograrlo!</p>
+</div>
+</div>
+</div>
+<!-- Desktop Action Buttons -->
+<div class="hidden lg:flex flex-col gap-3">
+<button class="w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-xl shadow-md text-base font-bold text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transform active:scale-95 transition-all" type="submit">
+<span>Crear Mi Meta</span>
+<span class="material-icons text-sm">arrow_forward</span>
+</button>
+<button class="w-full py-3 px-6 rounded-xl text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-primary/10 transition-colors" type="button">
+                        Cancelar
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Simple Footer -->
+<footer class="mt-auto py-6 border-t border-slate-200 dark:border-primary/10">
+<div class="container mx-auto px-4 text-center">
+<p class="text-sm text-slate-400">© 2023 KioskIA - Educación Financiera Escolar</p>
+</div>
+</footer>
+</body></html>

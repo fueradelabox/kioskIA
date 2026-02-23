@@ -1,0 +1,130 @@
+import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { useDarkMode } from '../../context/DarkModeContext'
+
+const navItems = [
+    { path: '/estudiante', icon: 'home', label: 'Inicio', end: true },
+    { path: '/estudiante/ahorro/crear', icon: 'savings', label: 'Mi Ahorro', end: false },
+    { path: '/estudiante/historial', icon: 'history', label: 'Historial', end: false },
+    { path: '/estudiante/perfil', icon: 'person', label: 'Perfil', end: false },
+]
+
+export default function StudentLayout() {
+    const navigate = useNavigate()
+    const { darkMode, toggleDarkMode } = useDarkMode()
+
+    return (
+        <div className="h-screen flex overflow-hidden bg-bg-light dark:bg-bg-dark">
+            {/* Desktop Sidebar */}
+            <aside className="hidden md:flex flex-col w-64 h-full bg-white dark:bg-surface-dark border-r border-gray-200 dark:border-gray-700 shadow-sm z-20">
+                <div className="p-6 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white font-bold text-xl shadow-md">
+                        K
+                    </div>
+                    <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">
+                        Kiosk<span className="text-primary">IA</span>
+                    </span>
+                </div>
+
+                <nav className="flex-1 px-4 space-y-1.5 mt-4">
+                    {navItems.map((item) => (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            end={item.end}
+                            className={({ isActive }) =>
+                                `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive
+                                    ? 'bg-primary/10 text-primary font-medium'
+                                    : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                }`
+                            }
+                        >
+                            <span className="material-icons-round">{item.icon}</span>
+                            <span className="font-medium">{item.label}</span>
+                        </NavLink>
+                    ))}
+                </nav>
+
+                {/* Dark mode toggle */}
+                <div className="px-4 mb-2">
+                    <button
+                        onClick={toggleDarkMode}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                    >
+                        <span className="material-icons-round">{darkMode ? 'light_mode' : 'dark_mode'}</span>
+                        <span className="font-medium">{darkMode ? 'Modo Claro' : 'Modo Oscuro'}</span>
+                    </button>
+                </div>
+
+                {/* User info */}
+                <div className="p-4 border-t border-gray-100 dark:border-gray-700">
+                    <div className="flex items-center gap-3 px-4 py-2">
+                        <div className="relative">
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                                MG
+                            </div>
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-healthy border-2 border-white dark:border-surface-dark rounded-full" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white">Martín G.</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">4° Básico A</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            {/* Main Content */}
+            <main className="flex-1 h-full overflow-y-auto relative">
+                {/* Mobile Header */}
+                <header className="md:hidden sticky top-0 z-30 bg-white/80 dark:bg-bg-dark/80 backdrop-blur-md px-5 py-3 flex justify-between items-center border-b border-gray-100 dark:border-gray-800">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                            K
+                        </div>
+                        <span className="font-bold text-lg text-gray-900 dark:text-white">
+                            Kiosk<span className="text-primary">IA</span>
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={toggleDarkMode}
+                            className="p-2 text-gray-500 dark:text-gray-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            <span className="material-icons-round text-xl">{darkMode ? 'light_mode' : 'dark_mode'}</span>
+                        </button>
+                        <button
+                            onClick={() => navigate('/estudiante/perfil')}
+                            className="relative p-2 text-gray-500 dark:text-gray-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            <span className="material-icons-round">notifications</span>
+                            <span className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full" />
+                        </button>
+                    </div>
+                </header>
+
+                <div className="pb-24 md:pb-8">
+                    <Outlet />
+                </div>
+            </main>
+
+            {/* Mobile Bottom Navigation */}
+            <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-surface-dark border-t border-gray-200 dark:border-gray-700 pb-safe z-40">
+                <div className="flex justify-around items-center h-16">
+                    {navItems.map((item) => (
+                        <NavLink
+                            key={item.path}
+                            to={item.path}
+                            end={item.end}
+                            className={({ isActive }) =>
+                                `flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg transition-colors ${isActive ? 'text-primary' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                                }`
+                            }
+                        >
+                            <span className="material-icons-round text-xl">{item.icon}</span>
+                            <span className="text-[10px] font-medium">{item.label}</span>
+                        </NavLink>
+                    ))}
+                </div>
+            </nav>
+        </div>
+    )
+}
