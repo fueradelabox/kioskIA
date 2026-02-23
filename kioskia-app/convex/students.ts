@@ -8,16 +8,25 @@ export const getProfile = query({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) return null;
 
-        const user = await ctx.db
+        const users = await ctx.db
             .query("users")
             .filter((q) => q.eq(q.field("email"), identity.email))
-            .first();
-        if (!user) return null;
+            .collect();
 
-        return await ctx.db
-            .query("students")
-            .withIndex("by_userId", (q) => q.eq("userId", user._id))
-            .first();
+        for (const user of users) {
+            const student = await ctx.db
+                .query("students")
+                .withIndex("by_userId", (q) => q.eq("userId", user._id))
+                .first();
+            if (student) {
+                return {
+                    ...student,
+                    generalBalance: student.generalBalance ?? student.balance ?? 0,
+                    healthyBalance: student.healthyBalance ?? 0,
+                };
+            }
+        }
+        return null;
     },
 });
 
@@ -219,14 +228,14 @@ export const transferToSavings = mutation({
             .first();
         if (!student) throw new Error("Perfil no encontrado");
 
-        if (student.balance < args.amount) {
+        if (student.generalBalance < args.amount) {
             throw new Error("Saldo insuficiente");
         }
 
-        const newBalance = student.balance - args.amount;
+        const newBalance = student.generalBalance - args.amount;
 
         // Update student balance
-        await ctx.db.patch(student._id, { balance: newBalance });
+        await ctx.db.patch(student._id, { generalBalance: newBalance });
 
         // Update savings goal
         const goal = await ctx.db.get(args.goalId);
