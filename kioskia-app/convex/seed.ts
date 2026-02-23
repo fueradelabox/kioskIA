@@ -9,10 +9,10 @@ export const seedDatabase = mutation({
     args: {},
     handler: async (ctx) => {
         // Check if data already exists
-        const existingProducts = await ctx.db.query('products').first()
-        if (existingProducts) {
-            return { message: 'Database already seeded' }
-        }
+        // const existingProducts = await ctx.db.query('products').first()
+        // if (existingProducts) {
+        //     return { message: 'Database already seeded' }
+        // }
 
         // --- Users ---
         const studentUserId = await ctx.db.insert('users', {
@@ -37,9 +37,10 @@ export const seedDatabase = mutation({
             rut: '12.345.678-9',
             grade: '5° Básico',
             avatarInitials: 'MG',
-            balance: 15000,
+            generalBalance: 15000,
             healthyBalance: 8000,
             qrCode: 'KIOSK-12345678-9',
+            biometricId: 'MOCK-BIO-001',
         })
 
         // --- Parent ---
