@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { convexAuth } from "@convex-dev/auth/server";
 
 const ResendProvider = {

@@ -20,8 +20,8 @@ export default function ParentLayout() {
 
     // Set first child as active by default
     useEffect(() => {
-        if (kids.length > 0 && !activeChildId) {
-            setActiveChildId(kids[0]._id)
+        if (kids.length > 0 && !activeChildId && kids[0]) {
+            setActiveChildId(kids[0]?._id)
         }
     }, [kids, activeChildId])
 
