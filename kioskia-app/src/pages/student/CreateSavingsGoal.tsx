@@ -18,8 +18,8 @@ export default function CreateSavingsGoal() {
         try {
             await createSavingsGoal({ name: goalName, targetAmount: Number(goalAmount), icon: '🎯' })
             navigate('/estudiante')
-        } catch (err: any) {
-            setError(err?.message || 'Error al crear meta')
+        } catch (err: unknown) {
+            setError((err as Error)?.message || 'Error al crear meta')
             setSaving(false)
         }
     }
@@ -197,7 +197,7 @@ export default function CreateSavingsGoal() {
                     {/* Desktop Actions */}
                     <div className="hidden lg:flex flex-col gap-3">
                         <button
-                            onClick={handleSubmit as any}
+                            onClick={handleSubmit as unknown as React.MouseEventHandler}
                             disabled={saving || !goalName || !goalAmount}
                             className="w-full bg-gradient-to-r from-primary to-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 hover:shadow-xl active:scale-[0.98] transition-all disabled:opacity-60"
                         >

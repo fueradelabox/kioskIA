@@ -18,8 +18,8 @@ export default function StudentLogin() {
         try {
             await signIn('resend', { email })
             setSent(true)
-        } catch (err: any) {
-            setError(err?.message || 'Error al enviar el enlace mágico')
+        } catch (err: unknown) {
+            setError((err as Error)?.message || 'Error al enviar el enlace mágico')
         } finally {
             setLoading(false)
         }

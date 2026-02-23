@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useProducts, useProcessPayment, useFindStudentByRut } from '../../hooks/useVendorData'
+import type { Id } from '../../../convex/_generated/dataModel'
 
 interface CartItem {
     productId?: string
@@ -60,7 +61,7 @@ export default function VendorPOS() {
         }
     }, [showPayModal, showFruitMenu])
 
-    const addToCartByProduct = useCallback((product: any) => {
+    const addToCartByProduct = useCallback((product: { _id?: string; name: string; price: number; icon: string; isHealthy: boolean; category: string }) => {
         setCart(prev => {
             const key = product._id || product.name
             const existing = prev.find(i => (i.productId || i.name) === key)
@@ -130,7 +131,7 @@ export default function VendorPOS() {
         e.preventDefault()
         if (!barcodeInput.trim()) return
 
-        const product = products.find(p => (p as any).barcode === barcodeInput.trim())
+        const product = products.find(p => (p as { barcode?: string }).barcode === barcodeInput.trim())
         if (product) {
             addToCartByProduct(product)
             setBarcodeFlash(true)
@@ -154,7 +155,7 @@ export default function VendorPOS() {
 
         try {
             const items = cart.map(i => ({
-                productId: i.productId as any,
+                productId: i.productId as Id<"products">,
                 name: i.name,
                 price: i.price,
                 qty: i.qty,
@@ -165,8 +166,8 @@ export default function VendorPOS() {
             setShowPayModal(false)
             setStudentRut('')
             navigate('/vendedor/exito')
-        } catch (err: any) {
-            setPayError(err?.message || 'Error en el pago')
+        } catch (err: unknown) {
+            setPayError((err as Error)?.message || 'Error en el pago')
         }
         setPaying(false)
     }

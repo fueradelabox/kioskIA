@@ -1,0 +1,118 @@
+
+> kioskia-app@0.0.0 lint
+> eslint .
+
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/convex/_generated/api.js
+  1:1  warning  Unused eslint-disable directive (no problems were reported)
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/convex/_generated/dataModel.d.ts
+  1:1  warning  Unused eslint-disable directive (no problems were reported)
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/convex/_generated/server.d.ts
+  1:1  warning  Unused eslint-disable directive (no problems were reported)
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/convex/_generated/server.js
+  1:1  warning  Unused eslint-disable directive (no problems were reported)
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/convex/auth.ts
+  8:60  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/convex/reset.ts
+  19:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/convex/schema.ts
+  5:16  error  '_authUsers' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/context/AuthContext.tsx
+  73:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/context/DarkModeContext.tsx
+  35:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/pages/parent/ParentDeposit.tsx
+   33:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   75:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  220:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/pages/parent/ParentLayout.tsx
+   24:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/pages/parent/ParentLayout.tsx:24:13
+  22 |     useEffect(() => {
+  23 |         if (kids.length > 0 && !activeChildId && kids[0]) {
+> 24 |             setActiveChildId(kids[0]?._id)
+     |             ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  25 |         }
+  26 |     }, [kids, activeChildId])
+  27 |  react-hooks/set-state-in-effect
+   53:43  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+  121:47  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            @typescript-eslint/no-explicit-any
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/pages/parent/ParentLimits.tsx
+  21:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/pages/parent/ParentLimits.tsx:21:13
+  19 |     useEffect(() => {
+  20 |         if (dbLimit) {
+> 21 |             setEnabled(dbLimit.enabled)
+     |             ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  22 |             setLimitPercent(dbLimit.unhealthyPercent)
+  23 |         }
+  24 |     }, [dbLimit])  react-hooks/set-state-in-effect
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/pages/parent/ParentLogin.tsx
+  21:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/pages/student/CreateSavingsGoal.tsx
+   21:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  200:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/pages/student/StudentLogin.tsx
+  21:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/pages/student/StudentProfile.tsx
+  19:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/pages/student/StudentProfile.tsx:19:13
+  17 |     useEffect(() => {
+  18 |         if (student) {
+> 19 |             setName(student.fullName)
+     |             ^^^^^^^ Avoid calling setState() directly within an effect
+  20 |             setEmail(student.email || '')
+  21 |         }
+  22 |     }, [student])  react-hooks/set-state-in-effect
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/pages/student/TransferToSavings.tsx
+  30:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/pages/vendor/VendorLogin.tsx
+  21:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/felipevicencio/Desktop/KioskIA/kioskia-app/src/pages/vendor/VendorPOS.tsx
+   63:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  133:50  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  157:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  168:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 27 problems (23 errors, 4 warnings)
+  0 errors and 4 warnings potentially fixable with the `--fix` option.
+

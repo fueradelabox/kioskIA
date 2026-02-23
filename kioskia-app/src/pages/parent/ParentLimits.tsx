@@ -18,6 +18,7 @@ export default function ParentLimits() {
 
     useEffect(() => {
         if (dbLimit) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setEnabled(dbLimit.enabled)
             setLimitPercent(dbLimit.unhealthyPercent)
         }

@@ -5,7 +5,7 @@ const ResendProvider = {
     id: "resend",
     type: "email" as const,
     name: "Resend",
-    async sendVerificationRequest({ identifier: to, url }: any) {
+    async sendVerificationRequest({ identifier: to, url }: { identifier: string; url: string }) {
         const res = await fetch("https://api.resend.com/emails", {
             method: "POST",
             headers: {

@@ -30,8 +30,8 @@ export default function ParentDeposit() {
             setSuccess(true)
             setAmount('')
             setReference('')
-        } catch (err: any) {
-            setError(err?.message || 'Error al registrar el depósito')
+        } catch (err: unknown) {
+            setError((err as Error)?.message || 'Error al registrar el depósito')
         }
         setLoading(false)
     }
@@ -72,27 +72,30 @@ export default function ParentDeposit() {
             <div className="bg-white dark:bg-surface-dark rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-800">
                 <h3 className="font-bold text-gray-900 dark:text-white mb-3">Seleccionar Hijo/a</h3>
                 <div className="grid grid-cols-2 gap-3">
-                    {children.map((child: any) => (
-                        <button
-                            key={child._id}
-                            onClick={() => setSelectedChild(child._id)}
-                            className={`p-4 rounded-xl border-2 transition-all text-left ${selectedChild === child._id
-                                ? 'border-primary bg-primary/5 shadow-md'
-                                : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
-                                }`}
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white font-bold text-sm">
-                                    {child.initials}
+                    {children.map((child) => {
+                        if (!child) return null;
+                        return (
+                            <button
+                                key={child._id}
+                                onClick={() => setSelectedChild(child._id)}
+                                className={`p-4 rounded-xl border-2 transition-all text-left ${selectedChild === child._id
+                                    ? 'border-primary bg-primary/5 shadow-md'
+                                    : 'border-gray-200 dark:border-gray-700 hover:border-primary/50'
+                                    }`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center text-white font-bold text-sm">
+                                        {child.initials}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-sm text-gray-900 dark:text-white">{child.fullName}</p>
+                                        <p className="text-xs text-gray-400">{child.grade}</p>
+                                        <p className="text-xs font-bold text-primary">Saldo: ${child.balance.toLocaleString('es-CL')}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="font-bold text-sm text-gray-900 dark:text-white">{child.fullName}</p>
-                                    <p className="text-xs text-gray-400">{child.grade}</p>
-                                    <p className="text-xs font-bold text-primary">Saldo: ${child.balance.toLocaleString('es-CL')}</p>
-                                </div>
-                            </div>
-                        </button>
-                    ))}
+                            </button>
+                        )
+                    })}
                 </div>
             </div>
 
@@ -217,33 +220,36 @@ export default function ParentDeposit() {
                             <p className="text-sm">No hay depósitos registrados</p>
                         </div>
                     )}
-                    {deposits.map((deposit: any) => (
-                        <div key={deposit._id} className="px-5 py-4 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${deposit.status === 'confirmed'
-                                    ? 'bg-green-100 dark:bg-green-900/30'
-                                    : 'bg-amber-100 dark:bg-amber-900/30'
+                    {deposits.map((deposit) => {
+                        if (!deposit) return null;
+                        return (
+                            <div key={deposit._id} className="px-5 py-4 flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${deposit.status === 'confirmed'
+                                        ? 'bg-green-100 dark:bg-green-900/30'
+                                        : 'bg-amber-100 dark:bg-amber-900/30'
+                                        }`}>
+                                        <span className={`material-icons-round ${deposit.status === 'confirmed' ? 'text-green-600' : 'text-amber-600'}`}>
+                                            {deposit.status === 'confirmed' ? 'check_circle' : 'pending'}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-sm text-gray-800 dark:text-gray-200">${deposit.amount.toLocaleString('es-CL')}</p>
+                                        <p className="text-xs text-gray-400">Ref: {deposit.reference}</p>
+                                        <p className="text-[10px] text-gray-400">
+                                            {new Date(deposit._creationTime).toLocaleString('es-CL', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                        </p>
+                                    </div>
+                                </div>
+                                <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${deposit.status === 'confirmed'
+                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                                    : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
                                     }`}>
-                                    <span className={`material-icons-round ${deposit.status === 'confirmed' ? 'text-green-600' : 'text-amber-600'}`}>
-                                        {deposit.status === 'confirmed' ? 'check_circle' : 'pending'}
-                                    </span>
-                                </div>
-                                <div>
-                                    <p className="font-semibold text-sm text-gray-800 dark:text-gray-200">${deposit.amount.toLocaleString('es-CL')}</p>
-                                    <p className="text-xs text-gray-400">Ref: {deposit.reference}</p>
-                                    <p className="text-[10px] text-gray-400">
-                                        {new Date(deposit._creationTime).toLocaleString('es-CL', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                                    </p>
-                                </div>
+                                    {deposit.status === 'confirmed' ? 'Confirmado' : 'Pendiente'}
+                                </span>
                             </div>
-                            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${deposit.status === 'confirmed'
-                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                                : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
-                                }`}>
-                                {deposit.status === 'confirmed' ? 'Confirmado' : 'Pendiente'}
-                            </span>
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
             </div>
         </div>

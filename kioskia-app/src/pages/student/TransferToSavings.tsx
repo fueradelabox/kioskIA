@@ -27,8 +27,8 @@ export default function TransferToSavings() {
         try {
             await transferToSavings({ goalId: goal._id, amount: numAmount })
             navigate('/estudiante')
-        } catch (err: any) {
-            setError(err?.message || 'Error al transferir')
+        } catch (err: unknown) {
+            setError((err as Error)?.message || 'Error al transferir')
             setSaving(false)
         }
     }

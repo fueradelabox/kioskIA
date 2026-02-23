@@ -16,6 +16,7 @@ export default function StudentProfile() {
 
     useEffect(() => {
         if (student) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setName(student.fullName)
             setEmail(student.email || '')
         }

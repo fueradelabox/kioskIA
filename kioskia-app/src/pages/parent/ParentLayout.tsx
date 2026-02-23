@@ -21,6 +21,7 @@ export default function ParentLayout() {
     // Set first child as active by default
     useEffect(() => {
         if (kids.length > 0 && !activeChildId && kids[0]) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setActiveChildId(kids[0]?._id)
         }
     }, [kids, activeChildId])
@@ -50,29 +51,32 @@ export default function ParentLayout() {
                     <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-3">Mis Hijos</p>
                     <div className="space-y-2">
                         {loading && <p className="text-xs text-gray-400">Cargando...</p>}
-                        {kids.map((child: any) => (
-                            <button
-                                key={child._id}
-                                onClick={() => setActiveChildId(child._id)}
-                                className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left ${activeChildId === child._id
-                                    ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700'
-                                    : 'hover:bg-gray-50 dark:hover:bg-gray-800 border border-transparent'
-                                    }`}
-                            >
-                                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold ${activeChildId === child._id
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                                    }`}>
-                                    {child.initials}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className={`font-semibold text-sm truncate ${activeChildId === child._id ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300'}`}>
-                                        {child.fullName}
-                                    </p>
-                                    <p className="text-xs text-gray-400 truncate">{child.grade}</p>
-                                </div>
-                            </button>
-                        ))}
+                        {kids.map((child) => {
+                            if (!child) return null;
+                            return (
+                                <button
+                                    key={child._id}
+                                    onClick={() => setActiveChildId(child._id)}
+                                    className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all text-left ${activeChildId === child._id
+                                        ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700'
+                                        : 'hover:bg-gray-50 dark:hover:bg-gray-800 border border-transparent'
+                                        }`}
+                                >
+                                    <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold ${activeChildId === child._id
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                                        }`}>
+                                        {child.initials}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className={`font-semibold text-sm truncate ${activeChildId === child._id ? 'text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300'}`}>
+                                            {child.fullName}
+                                        </p>
+                                        <p className="text-xs text-gray-400 truncate">{child.grade}</p>
+                                    </div>
+                                </button>
+                            )
+                        })}
                     </div>
                 </div>
 
@@ -118,13 +122,16 @@ export default function ParentLayout() {
                     <div className="p-4 border-t border-gray-100 dark:border-gray-800 space-y-3 bg-white dark:bg-surface-dark">
                         {/* Mobile Children Selector */}
                         <div className="flex gap-2 overflow-x-auto pb-2">
-                            {kids.map((child: any) => (
-                                <button key={child._id} onClick={() => { setActiveChildId(child._id); setMobileMenuOpen(false) }}
-                                    className={`flex items-center gap-2 px-3 py-2 rounded-xl whitespace-nowrap text-sm font-medium transition-all ${activeChildId === child._id ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
-                                    <span className="text-xs font-bold">{child.initials}</span>
-                                    {child.fullName.split(' ')[0]}
-                                </button>
-                            ))}
+                            {kids.map((child) => {
+                                if (!child) return null;
+                                return (
+                                    <button key={child._id} onClick={() => { setActiveChildId(child._id); setMobileMenuOpen(false) }}
+                                        className={`flex items-center gap-2 px-3 py-2 rounded-xl whitespace-nowrap text-sm font-medium transition-all ${activeChildId === child._id ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
+                                        <span className="text-xs font-bold">{child.initials}</span>
+                                        {child.fullName.split(' ')[0]}
+                                    </button>
+                                )
+                            })}
                         </div>
                         <NavLink to="/padre" end onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
                             <span className="material-icons-round">dashboard</span> Dashboard
