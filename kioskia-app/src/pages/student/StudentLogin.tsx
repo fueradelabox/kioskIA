@@ -115,7 +115,7 @@ export default function StudentLogin() {
                                 </>
                             ) : (
                                 <>
-                                    <span className="material-icons-round text-sm">magic_button</span>
+                                    <span className="material-icons-round text-sm">auto_awesome</span>
                                     Enviar enlace mágico
                                 </>
                             )}
