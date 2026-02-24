@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react'
 import { useStudentProfile, useSavingsGoal, useTransactions, useSpendingSummary } from '../../hooks/useStudentData'
 
 export default function StudentDashboard() {
@@ -5,8 +6,22 @@ export default function StudentDashboard() {
     const savingsGoal = useSavingsGoal()
     const transactions = useTransactions({ limit: 8 })
     const summary = useSpendingSummary()
+    const [showError, setShowError] = useState(false)
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-    if (profile === undefined) {
+    // Delay showing the "not found" error to avoid flash during auth initialization
+    useEffect(() => {
+        if (profile === null) {
+            timerRef.current = setTimeout(() => setShowError(true), 3000)
+            return () => { if (timerRef.current) clearTimeout(timerRef.current) }
+        }
+        // Profile loaded successfully — no error to show
+        timerRef.current = null
+        return undefined
+    }, [profile])
+
+    // Show spinner while loading or during auth initialization grace period
+    if (profile === undefined || (profile === null && !showError)) {
         return (
             <div className="flex items-center justify-center py-20">
                 <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -14,7 +29,7 @@ export default function StudentDashboard() {
         )
     }
 
-    if (profile === null) {
+    if (!profile) {
         return (
             <div className="flex flex-col items-center justify-center py-20 text-center px-6">
                 <span className="material-icons-round text-5xl text-amber-500 mb-4">warning</span>
