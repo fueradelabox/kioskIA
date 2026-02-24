@@ -53,6 +53,7 @@ export const getProfile = query({
                 console.log("[getProfile] Found student:", student.fullName, "via userId:", String(user._id));
                 return {
                     ...student,
+                    email: student.email ?? email,
                     generalBalance: student.generalBalance ?? (student as any).balance ?? 0,
                     healthyBalance: student.healthyBalance ?? 0,
                     avatarInitials: student.avatarInitials ?? student.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase(),
@@ -68,6 +69,7 @@ export const getProfile = query({
         if (studentByEmail) {
             return {
                 ...studentByEmail,
+                email: studentByEmail.email ?? email,
                 generalBalance: studentByEmail.generalBalance ?? (studentByEmail as any).balance ?? 0,
                 healthyBalance: studentByEmail.healthyBalance ?? 0,
                 avatarInitials: studentByEmail.avatarInitials ?? studentByEmail.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase(),
