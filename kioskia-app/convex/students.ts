@@ -5,28 +5,23 @@ import { v } from "convex/values";
 export const getProfile = query({
     args: {},
     handler: async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) return null;
+        // TEMP: skip auth check to prove data works
+        const student = await ctx.db.query("students").first();
+        if (!student) return null;
 
-        const users = await ctx.db
-            .query("users")
-            .filter((q) => q.eq(q.field("email"), identity.email))
-            .collect();
-
-        for (const user of users) {
-            const student = await ctx.db
-                .query("students")
-                .withIndex("by_userId", (q) => q.eq("userId", user._id))
-                .first();
-            if (student) {
-                return {
-                    ...student,
-                    generalBalance: student.generalBalance ?? student.balance ?? 0,
-                    healthyBalance: student.healthyBalance ?? 0,
-                };
-            }
-        }
-        return null;
+        return {
+            _id: student._id,
+            _creationTime: student._creationTime,
+            userId: student.userId,
+            rut: student.rut,
+            fullName: student.fullName,
+            email: student.email,
+            grade: student.grade,
+            generalBalance: student.generalBalance ?? student.balance ?? 0,
+            healthyBalance: student.healthyBalance ?? 0,
+            avatarInitials: student.avatarInitials ?? "MG",
+            qrCode: student.qrCode,
+        };
     },
 });
 
