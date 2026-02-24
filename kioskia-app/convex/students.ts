@@ -25,11 +25,25 @@ export const getProfile = query({
             if (student) {
                 return {
                     ...student,
-                    generalBalance: student.generalBalance ?? student.balance ?? 0,
+                    generalBalance: student.generalBalance ?? (student as any).balance ?? 0,
                     healthyBalance: student.healthyBalance ?? 0,
-                    avatarInitials: student.avatarInitials ?? student.fullName.split(' ').map(n => n[0]).join('').toUpperCase(),
+                    avatarInitials: student.avatarInitials ?? student.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase(),
                 };
             }
+        }
+
+        // Fallback: look up student directly by email
+        const studentByEmail = await ctx.db
+            .query("students")
+            .filter((q) => q.eq(q.field("email"), email))
+            .first();
+        if (studentByEmail) {
+            return {
+                ...studentByEmail,
+                generalBalance: studentByEmail.generalBalance ?? (studentByEmail as any).balance ?? 0,
+                healthyBalance: studentByEmail.healthyBalance ?? 0,
+                avatarInitials: studentByEmail.avatarInitials ?? studentByEmail.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase(),
+            };
         }
         return null;
     },
