@@ -47,6 +47,15 @@ export function useFindStudentByQR(qrCode: string | null) {
     return data ?? null
 }
 
+/** Find a student by Biometric ID */
+export function useFindStudentByBiometric(biometricId: string | null) {
+    const data = useQuery(
+        api.vendors.findStudentByBiometric,
+        biometricId ? { biometricId } : "skip"
+    )
+    return data ?? null
+}
+
 /** Get vendor sales dashboard data */
 export function useVendorSales() {
     const data = useQuery(api.vendors.getVendorSales)

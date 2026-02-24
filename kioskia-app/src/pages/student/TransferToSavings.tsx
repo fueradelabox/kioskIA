@@ -11,7 +11,7 @@ export default function TransferToSavings() {
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
 
-    const currentBalance = student?.balance || 0
+    const currentBalance = student?.generalBalance || 0
     const currentSavings = goal?.currentAmount || 0
     const goalAmount = goal?.targetAmount || 1
 

@@ -49,7 +49,7 @@ export default function ParentLimits() {
         )
     }
 
-    const balance = student?.balance || 0
+    const balance = student?.generalBalance || 0
     const maxUnhealthy = Math.round(balance * limitPercent / 100)
 
     const exampleProducts = [

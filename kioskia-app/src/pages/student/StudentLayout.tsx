@@ -1,5 +1,7 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useDarkMode } from '../../context/DarkModeContext'
+import { useStudentProfile } from '../../hooks/useStudentData'
+import { useAuth } from '../../context/AuthContext'
 
 const navItems = [
     { path: '/estudiante', icon: 'home', label: 'Inicio', end: true },
@@ -11,6 +13,15 @@ const navItems = [
 export default function StudentLayout() {
     const navigate = useNavigate()
     const { darkMode, toggleDarkMode } = useDarkMode()
+    const { signOut } = useAuth()
+    const student = useStudentProfile()
+
+    // Dynamic student data with fallbacks
+    const initials = student?.avatarInitials || student?.fullName?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || '?'
+    const displayName = student?.fullName
+        ? student.fullName.split(' ')[0] + ' ' + (student.fullName.split(' ')[1]?.[0] || '') + '.'
+        : 'Cargando...'
+    const grade = student?.grade || ''
 
     return (
         <div className="h-screen flex overflow-hidden bg-bg-light dark:bg-bg-dark">
@@ -55,19 +66,26 @@ export default function StudentLayout() {
                     </button>
                 </div>
 
-                {/* User info */}
+                {/* User info — dynamic */}
                 <div className="p-4 border-t border-gray-100 dark:border-gray-700">
                     <div className="flex items-center gap-3 px-4 py-2">
                         <div className="relative">
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-white font-bold text-sm shadow-sm">
-                                MG
+                                {initials}
                             </div>
                             <div className="absolute bottom-0 right-0 w-3 h-3 bg-healthy border-2 border-white dark:border-surface-dark rounded-full" />
                         </div>
-                        <div>
-                            <p className="text-sm font-semibold text-gray-900 dark:text-white">Martín G.</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">4° Básico A</p>
+                        <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{displayName}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{grade}</p>
                         </div>
+                        <button
+                            onClick={signOut}
+                            title="Cerrar Sesión"
+                            className="p-1.5 text-gray-400 hover:text-danger hover:bg-danger/10 rounded-lg transition-colors"
+                        >
+                            <span className="material-icons-round text-lg">logout</span>
+                        </button>
                     </div>
                 </div>
             </aside>
@@ -93,10 +111,9 @@ export default function StudentLayout() {
                         </button>
                         <button
                             onClick={() => navigate('/estudiante/perfil')}
-                            className="relative p-2 text-gray-500 dark:text-gray-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            className="relative w-8 h-8 rounded-full bg-gradient-to-br from-primary to-emerald-400 flex items-center justify-center text-white font-bold text-xs shadow-sm"
                         >
-                            <span className="material-icons-round">notifications</span>
-                            <span className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full" />
+                            {initials}
                         </button>
                     </div>
                 </header>

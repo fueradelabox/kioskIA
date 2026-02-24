@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
-import { useTransactions } from '../../hooks/useStudentData'
+import { useQuery } from 'convex/react'
+import { api } from '../../../convex/_generated/api'
 
 type FilterType = 'all' | 'compras' | 'recargas' | 'ahorros'
 
@@ -14,8 +15,9 @@ export default function TransactionHistory() {
         ahorros: 'ahorro',
     }
 
-    const transactions = useTransactions({ filterType: filterMap[filter], limit: 50 })
-    const loading = transactions.length === 0
+    const rawTransactions = useQuery(api.students.getTransactions, { filterType: filterMap[filter], limit: 50 })
+    const loading = rawTransactions === undefined
+    const transactions = useMemo(() => rawTransactions ?? [], [rawTransactions])
 
     const filters: { key: FilterType; label: string }[] = [
         { key: 'all', label: 'Todas' },

@@ -1,0 +1,295 @@
+diff --git a/kioskia-app/convex/parents.ts b/kioskia-app/convex/parents.ts
+index fc62950..04b407a 100644
+--- a/kioskia-app/convex/parents.ts
++++ b/kioskia-app/convex/parents.ts
+@@ -191,8 +191,8 @@ export const rechargeBalance = mutation({
+         const student = await ctx.db.get(args.studentId);
+         if (!student) throw new Error("Estudiante no encontrado");
+ 
+-        const newBalance = student.balance + args.amount;
+-        await ctx.db.patch(args.studentId, { balance: newBalance });
++        const newBalance = student.generalBalance + args.amount;
++        await ctx.db.patch(args.studentId, { generalBalance: newBalance });
+ 
+         await ctx.db.insert("transactions", {
+             studentId: args.studentId,
+@@ -243,8 +243,8 @@ export const createDeposit = mutation({
+         const student = await ctx.db.get(args.studentId);
+         if (!student) throw new Error("Estudiante no encontrado");
+ 
+-        const newBalance = student.balance + args.amount;
+-        await ctx.db.patch(args.studentId, { balance: newBalance });
++        const newBalance = student.generalBalance + args.amount;
++        await ctx.db.patch(args.studentId, { generalBalance: newBalance });
+ 
+         await ctx.db.insert("transactions", {
+             studentId: args.studentId,
+diff --git a/kioskia-app/convex/schema.ts b/kioskia-app/convex/schema.ts
+index 9ec02a0..08384bf 100644
+--- a/kioskia-app/convex/schema.ts
++++ b/kioskia-app/convex/schema.ts
+@@ -34,14 +34,17 @@ export default defineSchema({
+     email: v.optional(v.string()),
+     grade: v.optional(v.string()),
+     schoolId: v.optional(v.id("schools")),
+-    balance: v.number(),
++    generalBalance: v.number(),
+     healthyBalance: v.number(),
+     avatarInitials: v.optional(v.string()),
+     qrCode: v.optional(v.string()),
++    biometricId: v.optional(v.string()), // Lector de huella o hash biométrico
++    pin: v.optional(v.string()),         // Fallback code o pin seguro
+   })
+     .index("by_userId", ["userId"])
+     .index("by_rut", ["rut"])
+-    .index("by_qrCode", ["qrCode"]),
++    .index("by_qrCode", ["qrCode"])
++    .index("by_biometricId", ["biometricId"]),
+ 
+   parents: defineTable({
+     userId: v.id("users"),
+diff --git a/kioskia-app/convex/students.ts b/kioskia-app/convex/students.ts
+index b086ed7..b15b498 100644
+--- a/kioskia-app/convex/students.ts
++++ b/kioskia-app/convex/students.ts
+@@ -219,14 +219,14 @@ export const transferToSavings = mutation({
+             .first();
+         if (!student) throw new Error("Perfil no encontrado");
+ 
+-        if (student.balance < args.amount) {
++        if (student.generalBalance < args.amount) {
+             throw new Error("Saldo insuficiente");
+         }
+ 
+-        const newBalance = student.balance - args.amount;
++        const newBalance = student.generalBalance - args.amount;
+ 
+         // Update student balance
+-        await ctx.db.patch(student._id, { balance: newBalance });
++        await ctx.db.patch(student._id, { generalBalance: newBalance });
+ 
+         // Update savings goal
+         const goal = await ctx.db.get(args.goalId);
+diff --git a/kioskia-app/convex/vendors.ts b/kioskia-app/convex/vendors.ts
+index 0d2c735..dbdee5c 100644
+--- a/kioskia-app/convex/vendors.ts
++++ b/kioskia-app/convex/vendors.ts
+@@ -39,7 +39,7 @@ export const findStudentByRut = query({
+         return {
+             _id: student._id,
+             fullName: student.fullName,
+-            balance: student.balance,
++            generalBalance: student.generalBalance,
+             healthyBalance: student.healthyBalance,
+             avatarInitials: student.avatarInitials,
+             grade: student.grade,
+@@ -59,12 +59,35 @@ export const findStudentByQR = query({
+         if (!student) return null;
+ 
+         return {
+-            _id: student._id,
++            initials: student.avatarInitials || student.fullName.substring(0, 2).toUpperCase(),
+             fullName: student.fullName,
+-            balance: student.balance,
++            grade: student.grade || '',
++            generalBalance: student.balance, // Assuming 'balance' maps to 'generalBalance'
+             healthyBalance: student.healthyBalance,
+-            avatarInitials: student.avatarInitials,
+-            grade: student.grade,
++            studentId: student._id
++        };
++    },
++});
++
++export const findStudentByBiometric = query({
++    args: { biometricId: v.string() },
++    handler: async (ctx, args) => {
++        const student = await ctx.db
++            .query("students")
++            .withIndex("by_biometricId", (q) => q.eq("biometricId", args.biometricId))
++            .first();
++
++        if (!student) {
++            throw new Error("Estudiante no encontrado");
++        }
++
++        return {
++            initials: student.avatarInitials || student.fullName.substring(0, 2).toUpperCase(),
++            fullName: student.fullName,
++            grade: student.grade || '',
++            generalBalance: student.generalBalance,
++            healthyBalance: student.healthyBalance,
++            studentId: student._id
+         };
+     },
+ });
+@@ -231,7 +254,7 @@ export const processPayment = mutation({
+             .filter((i) => !i.isHealthy)
+             .reduce((s, i) => s + i.price * i.qty, 0);
+ 
+-        if (student.balance < total) {
++        if (student.generalBalance + student.healthyBalance < total) {
+             throw new Error("Saldo insuficiente");
+         }
+ 
+@@ -243,7 +266,7 @@ export const processPayment = mutation({
+ 
+         if (limit?.enabled && unhealthyTotal > 0) {
+             const maxUnhealthy = Math.round(
+-                (student.balance * limit.unhealthyPercent) / 100
++                (student.generalBalance * limit.unhealthyPercent) / 100
+             );
+             if (unhealthyTotal > maxUnhealthy) {
+                 throw new Error("Supera el límite de productos no saludables");
+@@ -254,11 +277,11 @@ export const processPayment = mutation({
+         const healthyTotal = resolvedItems
+             .filter((i) => i.isHealthy)
+             .reduce((s, i) => s + i.price * i.qty, 0);
+-        const newBalance = student.balance - total;
++        const newBalance = student.generalBalance - Math.max(0, total - student.healthyBalance);
+         const newHealthyBalance = Math.max(0, student.healthyBalance - healthyTotal);
+ 
+         await ctx.db.patch(student._id, {
+-            balance: newBalance,
++            generalBalance: newBalance,
+             healthyBalance: newHealthyBalance,
+         });
+ 
+diff --git a/kioskia-app/src/pages/parent/ParentDashboard.tsx b/kioskia-app/src/pages/parent/ParentDashboard.tsx
+index 83dcc38..bd676df 100644
+--- a/kioskia-app/src/pages/parent/ParentDashboard.tsx
++++ b/kioskia-app/src/pages/parent/ParentDashboard.tsx
+@@ -39,8 +39,8 @@ export default function ParentDashboard() {
+         )
+     }
+ 
+-    const healthyPercent = student.balance > 0
+-        ? Math.round((student.healthyBalance / student.balance) * 100)
++    const healthyPercent = student.generalBalance > 0
++        ? Math.round((student.healthyBalance / student.generalBalance) * 100)
+         : 0
+ 
+     const handleRecharge = async () => {
+@@ -104,7 +104,7 @@ export default function ParentDashboard() {
+                             <span className="material-icons-round text-white/70">account_balance_wallet</span>
+                         </div>
+                         <div className="flex items-baseline gap-2 mb-6">
+-                            <span className="text-4xl md:text-5xl font-extrabold">${student.balance.toLocaleString('es-CL')}</span>
++                            <span className="text-4xl md:text-5xl font-extrabold">${student.generalBalance.toLocaleString('es-CL')}</span>
+                             <span className="text-white/60 font-medium">CLP</span>
+                         </div>
+                         <div className="grid grid-cols-2 gap-4">
+diff --git a/kioskia-app/src/pages/parent/ParentDeposit.tsx b/kioskia-app/src/pages/parent/ParentDeposit.tsx
+index 7ca1b46..45c3dd9 100644
+--- a/kioskia-app/src/pages/parent/ParentDeposit.tsx
++++ b/kioskia-app/src/pages/parent/ParentDeposit.tsx
+@@ -90,7 +90,7 @@ export default function ParentDeposit() {
+                                     <div>
+                                         <p className="font-bold text-sm text-gray-900 dark:text-white">{child.fullName}</p>
+                                         <p className="text-xs text-gray-400">{child.grade}</p>
+-                                        <p className="text-xs font-bold text-primary">Saldo: ${child.balance.toLocaleString('es-CL')}</p>
++                                        <p className="text-xs font-bold text-primary">Saldo: ${child.generalBalance.toLocaleString('es-CL')}</p>
+                                     </div>
+                                 </div>
+                             </button>
+diff --git a/kioskia-app/src/pages/parent/ParentLimits.tsx b/kioskia-app/src/pages/parent/ParentLimits.tsx
+index 2a55bc7..b3a822e 100644
+--- a/kioskia-app/src/pages/parent/ParentLimits.tsx
++++ b/kioskia-app/src/pages/parent/ParentLimits.tsx
+@@ -49,7 +49,7 @@ export default function ParentLimits() {
+         )
+     }
+ 
+-    const balance = student?.balance || 0
++    const balance = student?.generalBalance || 0
+     const maxUnhealthy = Math.round(balance * limitPercent / 100)
+ 
+     const exampleProducts = [
+diff --git a/kioskia-app/src/pages/student/StudentDashboard.tsx b/kioskia-app/src/pages/student/StudentDashboard.tsx
+index 80716f3..49e423d 100644
+--- a/kioskia-app/src/pages/student/StudentDashboard.tsx
++++ b/kioskia-app/src/pages/student/StudentDashboard.tsx
+@@ -14,7 +14,7 @@ export default function StudentDashboard() {
+         )
+     }
+ 
+-    const unhealthyBalance = profile.balance - profile.healthyBalance
++    const unhealthyBalance = profile.generalBalance - profile.healthyBalance
+     const savingsPercent = savingsGoal ? Math.min(100, Math.round((savingsGoal.currentAmount / savingsGoal.targetAmount) * 100)) : 0
+ 
+     return (
+@@ -35,7 +35,7 @@ export default function StudentDashboard() {
+             {/* Balance Card */}
+             <div className="bg-gradient-to-br from-primary via-primary-dark to-navy rounded-2xl p-6 text-white shadow-xl shadow-primary/20">
+                 <p className="text-xs font-semibold uppercase tracking-widest text-white/70 mb-1">Mi Saldo</p>
+-                <p className="text-4xl font-extrabold tracking-tight">${profile.balance.toLocaleString('es-CL')}</p>
++                <p className="text-4xl font-extrabold tracking-tight">${profile.generalBalance.toLocaleString('es-CL')}</p>
+                 <div className="mt-4 grid grid-cols-2 gap-3">
+                     <div className="bg-white/15 backdrop-blur-sm rounded-xl p-3">
+                         <div className="flex items-center gap-2 mb-1">
+diff --git a/kioskia-app/src/pages/student/TransactionHistory.tsx b/kioskia-app/src/pages/student/TransactionHistory.tsx
+index 0d3fbf3..eee45ee 100644
+--- a/kioskia-app/src/pages/student/TransactionHistory.tsx
++++ b/kioskia-app/src/pages/student/TransactionHistory.tsx
+@@ -147,7 +147,7 @@ export default function TransactionHistory() {
+                                                 </div>
+                                                 <div className="flex justify-between">
+                                                     <span className="text-gray-500">Saldo después</span>
+-                                                    <span className="font-bold text-gray-900 dark:text-white">${tx.balanceAfter.toLocaleString('es-CL')}</span>
++                                                    <span className="font-bold text-gray-900 dark:text-white">${tx.generalBalanceAfter.toLocaleString('es-CL')}</span>
+                                                 </div>
+                                             </div>
+                                         </div>
+diff --git a/kioskia-app/src/pages/student/TransferToSavings.tsx b/kioskia-app/src/pages/student/TransferToSavings.tsx
+index a4619e9..2f525c3 100644
+--- a/kioskia-app/src/pages/student/TransferToSavings.tsx
++++ b/kioskia-app/src/pages/student/TransferToSavings.tsx
+@@ -11,7 +11,7 @@ export default function TransferToSavings() {
+     const [saving, setSaving] = useState(false)
+     const [error, setError] = useState('')
+ 
+-    const currentBalance = student?.balance || 0
++    const currentBalance = student?.generalBalance || 0
+     const currentSavings = goal?.currentAmount || 0
+     const goalAmount = goal?.targetAmount || 1
+ 
+diff --git a/kioskia-app/src/pages/vendor/VendorPOS.tsx b/kioskia-app/src/pages/vendor/VendorPOS.tsx
+index 0cf742d..7b027bb 100644
+--- a/kioskia-app/src/pages/vendor/VendorPOS.tsx
++++ b/kioskia-app/src/pages/vendor/VendorPOS.tsx
+@@ -423,7 +423,7 @@ export default function VendorPOS() {
+                                 <div className="grid grid-cols-3 gap-2 text-center">
+                                     <div className="bg-white dark:bg-gray-800 rounded-lg p-2">
+                                         <p className="text-xs text-gray-500">Saldo Total</p>
+-                                        <p className="font-bold text-gray-900 dark:text-white">${studentData.balance.toLocaleString('es-CL')}</p>
++                                        <p className="font-bold text-gray-900 dark:text-white">${studentData.generalBalance.toLocaleString('es-CL')}</p>
+                                     </div>
+                                     <div className="bg-white dark:bg-gray-800 rounded-lg p-2">
+                                         <p className="text-xs text-green-600">Saludable</p>
+@@ -431,7 +431,7 @@ export default function VendorPOS() {
+                                     </div>
+                                     <div className="bg-white dark:bg-gray-800 rounded-lg p-2">
+                                         <p className="text-xs text-amber-600">No Salud.</p>
+-                                        <p className="font-bold text-amber-700">${(studentData.balance - studentData.healthyBalance).toLocaleString('es-CL')}</p>
++                                        <p className="font-bold text-amber-700">${(studentData.generalBalance - studentData.healthyBalance).toLocaleString('es-CL')}</p>
+                                     </div>
+                                 </div>
+                             </div>
+@@ -456,7 +456,7 @@ export default function VendorPOS() {
+                             </div>
+                         </div>
+ 
+-                        {studentData && total > studentData.balance && (
++                        {studentData && total > studentData.generalBalance && (
+                             <div className="mb-4 p-3 bg-danger/10 border border-danger/20 rounded-xl text-danger text-sm font-medium flex items-center gap-2">
+                                 <span className="material-icons-round text-sm">warning</span>
+                                 Saldo insuficiente
+@@ -467,7 +467,7 @@ export default function VendorPOS() {
+                             <button onClick={() => { setShowPayModal(false); setPayError('') }} className="flex-1 py-3 border border-gray-200 dark:border-gray-600 rounded-xl font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 transition-colors">
+                                 Cancelar
+                             </button>
+-                            <button onClick={handlePay} disabled={paying || !studentRut || (studentData !== null && total > studentData.balance)} className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl shadow-lg disabled:opacity-60 transition-all flex items-center justify-center gap-2">
++                            <button onClick={handlePay} disabled={paying || !studentRut || (studentData !== null && total > studentData.generalBalance)} className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl shadow-lg disabled:opacity-60 transition-all flex items-center justify-center gap-2">
+                                 {paying ? (
+                                     <>
+                                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

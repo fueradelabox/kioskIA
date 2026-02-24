@@ -16,6 +16,7 @@ export default function ParentDashboard() {
     const [rechargeModalOpen, setRechargeModalOpen] = useState(false)
     const [rewardModalOpen, setRewardModalOpen] = useState(false)
     const [rechargeAmount, setRechargeAmount] = useState('')
+    const [rechargeWalletType, setRechargeWalletType] = useState<'general' | 'healthy'>('general')
     const [rewardAmount, setRewardAmount] = useState('')
     const [processing, setProcessing] = useState(false)
 
@@ -39,16 +40,14 @@ export default function ParentDashboard() {
         )
     }
 
-    const healthyPercent = student.balance > 0
-        ? Math.round((student.healthyBalance / student.balance) * 100)
-        : 0
+    const totalBalance = student.generalBalance + student.healthyBalance
 
     const handleRecharge = async () => {
         const amount = Number(rechargeAmount)
         if (!amount || amount <= 0) return
         setProcessing(true)
         try {
-            await rechargeBalance({ studentId: student._id, amount })
+            await rechargeBalance({ studentId: student._id, amount, walletType: rechargeWalletType })
         } catch (err) {
             console.error(err)
         }
@@ -100,11 +99,11 @@ export default function ParentDashboard() {
                     <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl" />
                     <div className="relative z-10">
                         <div className="flex justify-between items-start mb-2">
-                            <span className="text-white/80 font-medium text-sm">Saldo Disponible</span>
+                            <span className="text-white/80 font-medium text-sm">Saldo Disponible (Total)</span>
                             <span className="material-icons-round text-white/70">account_balance_wallet</span>
                         </div>
                         <div className="flex items-baseline gap-2 mb-6">
-                            <span className="text-4xl md:text-5xl font-extrabold">${student.balance.toLocaleString('es-CL')}</span>
+                            <span className="text-4xl md:text-5xl font-extrabold">${totalBalance.toLocaleString('es-CL')}</span>
                             <span className="text-white/60 font-medium">CLP</span>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -113,8 +112,8 @@ export default function ParentDashboard() {
                                 <p className="text-xl font-bold">${student.healthyBalance.toLocaleString('es-CL')}</p>
                             </div>
                             <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4">
-                                <p className="text-[10px] text-white/60 uppercase tracking-widest font-bold">% Saludable</p>
-                                <p className="text-xl font-bold">{healthyPercent}%</p>
+                                <p className="text-[10px] text-white/60 uppercase tracking-widest font-bold">General Libre</p>
+                                <p className="text-xl font-bold">${student.generalBalance.toLocaleString('es-CL')}</p>
                             </div>
                         </div>
                     </div>
@@ -209,6 +208,20 @@ export default function ParentDashboard() {
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xl">$</span>
                             <input type="number" value={rechargeAmount} onChange={e => setRechargeAmount(e.target.value)} placeholder="0"
                                 className="w-full pl-10 pr-4 py-4 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-2xl font-bold text-center text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-primary" />
+                        </div>
+                        <div className="flex gap-2 mb-4 bg-gray-50 dark:bg-gray-800/50 p-1 rounded-xl">
+                            <button
+                                onClick={() => setRechargeWalletType('general')}
+                                className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${rechargeWalletType === 'general' ? 'bg-white dark:bg-gray-600 shadow text-blue-600' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            >
+                                General
+                            </button>
+                            <button
+                                onClick={() => setRechargeWalletType('healthy')}
+                                className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${rechargeWalletType === 'healthy' ? 'bg-green-50 dark:bg-green-900/30 shadow text-green-600' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            >
+                                Saludable
+                            </button>
                         </div>
                         <div className="flex gap-2 mb-4">
                             {[5000, 10000, 20000].map(v => (

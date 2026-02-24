@@ -17,13 +17,11 @@ export const getProfile = query({
         // First, check authAccounts to get the email
         const authAccounts = await ctx.db.query("authAccounts").collect();
         let authEmail: string | undefined;
-        let authUserId: string | undefined;
 
         for (const account of authAccounts) {
             // The subject or tokenIdentifier contains the userId
             if (String(account.userId) === subject || tokenIdentifier?.includes(String(account.userId))) {
                 authEmail = account.providerAccountId; // This is the email for resend provider
-                authUserId = String(account.userId);
                 break;
             }
         }
@@ -32,11 +30,10 @@ export const getProfile = query({
         const email = identity.email ?? authEmail;
 
         if (!email) {
-            console.log("[getProfile] No email found from identity or authAccounts");
             return null;
         }
 
-        console.log("[getProfile] Resolved email:", email, "authUserId:", authUserId);
+
 
         // Look up ALL users with this email
         const users = await ctx.db
@@ -50,7 +47,7 @@ export const getProfile = query({
                 .withIndex("by_userId", (q) => q.eq("userId", user._id))
                 .first();
             if (student) {
-                console.log("[getProfile] Found student:", student.fullName, "via userId:", String(user._id));
+
                 return {
                     ...student,
                     email: student.email ?? email,
@@ -75,7 +72,6 @@ export const getProfile = query({
                 avatarInitials: studentByEmail.avatarInitials ?? studentByEmail.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase(),
             };
         }
-        console.log("[getProfile] NO student found for email:", email);
         return null;
     },
 });

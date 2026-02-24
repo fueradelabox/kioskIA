@@ -60,7 +60,16 @@ function AuthenticatedProvider({ children }: { children: ReactNode }) {
         isLoading: roleData === undefined,
         role: roleData?.role ?? null,
         profileId: roleData?.profileId ?? null,
-        signOut: async () => { await signOut() },
+        signOut: async () => {
+            await signOut()
+            // Clear any Convex auth data from localStorage
+            Object.keys(localStorage).forEach(key => {
+                if (key.includes('convex') || key.includes('auth')) {
+                    localStorage.removeItem(key)
+                }
+            })
+            window.location.href = '/estudiante/login'
+        },
     }
 
     return (

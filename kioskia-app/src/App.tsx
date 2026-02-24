@@ -7,6 +7,11 @@ import CreateSavingsGoal from './pages/student/CreateSavingsGoal'
 import TransferToSavings from './pages/student/TransferToSavings'
 import TransactionHistory from './pages/student/TransactionHistory'
 import StudentProfile from './pages/student/StudentProfile'
+import FinancialEducation from './pages/student/FinancialEducation'
+import WisdomTest from './pages/student/WisdomTest'
+import Achievements from './pages/student/Achievements'
+import HealthyPlanner from './pages/student/HealthyPlanner'
+import YearlySummary from './pages/student/YearlySummary'
 import ParentLogin from './pages/parent/ParentLogin'
 import ParentLayout from './pages/parent/ParentLayout'
 import ParentDashboard from './pages/parent/ParentDashboard'
@@ -34,6 +39,12 @@ export default function App() {
           <Route path="ahorro/transferir" element={<TransferToSavings />} />
           <Route path="historial" element={<TransactionHistory />} />
           <Route path="perfil" element={<StudentProfile />} />
+          {/* Phase 3: Student Flow Additions */}
+          <Route path="educacion" element={<FinancialEducation />} />
+          <Route path="test" element={<WisdomTest />} />
+          <Route path="logros" element={<Achievements />} />
+          <Route path="planificador" element={<HealthyPlanner />} />
+          <Route path="resumen" element={<YearlySummary />} />
         </Route>
 
         {/* Parent */}

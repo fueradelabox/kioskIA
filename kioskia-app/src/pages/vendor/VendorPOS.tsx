@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { useProducts, useProcessPayment, useFindStudentByRut } from '../../hooks/useVendorData'
+import { useProducts, useProcessPayment, useFindStudentByRut, useFindStudentByBiometric } from '../../hooks/useVendorData'
 import type { Id } from '../../../convex/_generated/dataModel'
 
 interface CartItem {
@@ -43,7 +43,13 @@ export default function VendorPOS() {
     const [barcodeFlash, setBarcodeFlash] = useState(false)
     const barcodeRef = useRef<HTMLInputElement>(null)
 
-    const studentData = useFindStudentByRut(studentRut.length >= 10 ? studentRut : null)
+    const [biometricInput, setBiometricInput] = useState('')
+    const [mockBiometricMode, setMockBiometricMode] = useState(false)
+
+    // Either lookup by RUT or by Biometric ID
+    const studentDataByRut = useFindStudentByRut(studentRut.length >= 10 ? studentRut : null)
+    const studentDataByBio = useFindStudentByBiometric(biometricInput.length >= 5 ? biometricInput : null)
+    const studentData = mockBiometricMode ? studentDataByBio : studentDataByRut
 
     const categories = useMemo(() => {
         const cats = ['Todas', ...new Set(products.map(p => p.category))]
@@ -165,6 +171,7 @@ export default function VendorPOS() {
             setCart([])
             setShowPayModal(false)
             setStudentRut('')
+            setBiometricInput('')
             navigate('/vendedor/exito')
         } catch (err: unknown) {
             setPayError((err as Error)?.message || 'Error en el pago')
@@ -399,14 +406,52 @@ export default function VendorPOS() {
                             </div>
                         )}
 
-                        <div className="mb-4">
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">RUT del Estudiante</label>
-                            <input
-                                type="text" value={studentRut} onChange={e => setStudentRut(e.target.value)}
-                                placeholder="12.345.678-9"
-                                className="w-full px-4 py-3.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-amber-500"
-                            />
+                        <div className="flex gap-2 mb-4 bg-gray-100 dark:bg-gray-700/50 p-1 rounded-xl">
+                            <button
+                                onClick={() => { setMockBiometricMode(false); setBiometricInput(''); setStudentRut('') }}
+                                className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${!mockBiometricMode ? 'bg-white dark:bg-gray-800 shadow text-gray-900 dark:text-white' : 'text-gray-500'}`}
+                            >
+                                Ingreso Manual / NFC
+                            </button>
+                            <button
+                                onClick={() => { setMockBiometricMode(true); setBiometricInput(''); setStudentRut('') }}
+                                className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${mockBiometricMode ? 'bg-amber-500 shadow text-white' : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                            >
+                                Lector Biométrico
+                            </button>
                         </div>
+
+                        {!mockBiometricMode ? (
+                            <div className="mb-4">
+                                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">RUT del Estudiante</label>
+                                <input
+                                    type="text" value={studentRut} onChange={e => setStudentRut(e.target.value)}
+                                    placeholder="12.345.678-9"
+                                    className="w-full px-4 py-3.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-amber-500"
+                                />
+                            </div>
+                        ) : (
+                            <div className="mb-4">
+                                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Lector Biométrico (Mock)</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text" value={biometricInput} onChange={e => setBiometricInput(e.target.value)}
+                                        placeholder="Ej: MOCK-BIO-001"
+                                        className="flex-1 px-4 py-3.5 bg-amber-50 dark:bg-amber-900/10 border-2 border-amber-200 dark:border-amber-800/50 rounded-xl text-amber-900 dark:text-amber-100 outline-none focus:ring-amber-500 font-mono"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setBiometricInput('MOCK-BIO-001')}
+                                        className="px-4 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-xl font-bold hover:bg-amber-200 transition-colors"
+                                    >
+                                        Auto-Fill
+                                    </button>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-2">
+                                    En un entorno real, este input estaría oculto y escucharía el evento del lector USB.
+                                </p>
+                            </div>
+                        )}
 
                         {/* Student Info Preview */}
                         {studentData && (
@@ -423,7 +468,7 @@ export default function VendorPOS() {
                                 <div className="grid grid-cols-3 gap-2 text-center">
                                     <div className="bg-white dark:bg-gray-800 rounded-lg p-2">
                                         <p className="text-xs text-gray-500">Saldo Total</p>
-                                        <p className="font-bold text-gray-900 dark:text-white">${studentData.balance.toLocaleString('es-CL')}</p>
+                                        <p className="font-bold text-gray-900 dark:text-white">${studentData.generalBalance.toLocaleString('es-CL')}</p>
                                     </div>
                                     <div className="bg-white dark:bg-gray-800 rounded-lg p-2">
                                         <p className="text-xs text-green-600">Saludable</p>
@@ -431,7 +476,7 @@ export default function VendorPOS() {
                                     </div>
                                     <div className="bg-white dark:bg-gray-800 rounded-lg p-2">
                                         <p className="text-xs text-amber-600">No Salud.</p>
-                                        <p className="font-bold text-amber-700">${(studentData.balance - studentData.healthyBalance).toLocaleString('es-CL')}</p>
+                                        <p className="font-bold text-amber-700">${(studentData.generalBalance - studentData.healthyBalance).toLocaleString('es-CL')}</p>
                                     </div>
                                 </div>
                             </div>
@@ -456,7 +501,7 @@ export default function VendorPOS() {
                             </div>
                         </div>
 
-                        {studentData && total > studentData.balance && (
+                        {studentData && total > studentData.generalBalance && (
                             <div className="mb-4 p-3 bg-danger/10 border border-danger/20 rounded-xl text-danger text-sm font-medium flex items-center gap-2">
                                 <span className="material-icons-round text-sm">warning</span>
                                 Saldo insuficiente
@@ -467,7 +512,7 @@ export default function VendorPOS() {
                             <button onClick={() => { setShowPayModal(false); setPayError('') }} className="flex-1 py-3 border border-gray-200 dark:border-gray-600 rounded-xl font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 transition-colors">
                                 Cancelar
                             </button>
-                            <button onClick={handlePay} disabled={paying || !studentRut || (studentData !== null && total > studentData.balance)} className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl shadow-lg disabled:opacity-60 transition-all flex items-center justify-center gap-2">
+                            <button onClick={handlePay} disabled={paying || (!studentRut && !biometricInput) || (studentData !== null && total > studentData.generalBalance)} className="flex-1 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold rounded-xl shadow-lg disabled:opacity-60 transition-all flex items-center justify-center gap-2">
                                 {paying ? (
                                     <>
                                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

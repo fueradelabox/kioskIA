@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KioskIA Unified UI Kit Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=Poppins:wght@400;500;600;700&amp;family=PP+Neue+Montreal:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#FF6803", // Adjusted to match requested Premium Orange
+                        "secondary": "#00BFA5",
+                        "brand-blue": "#1E3A8A",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#23170f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "poppins": ["Poppins", "sans-serif"],
+                        "montreal": ["PP Neue Montreal", "sans-serif"], // Fallback to sans-serif if not loaded
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "2xl": "1.5rem", "3xl": "2rem", "full": "9999px"},
+                    boxShadow: {
+                        '3d': '0px 4px 0px 0px #CC5200', // Custom 3D shadow for buttons
+                        '3d-active': '0px 2px 0px 0px #CC5200',
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display antialiased min-h-screen">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Header Section -->
+<header class="w-full bg-white dark:bg-[#2a1d15] border-b border-primary/20 sticky top-0 z-50">
+<div class="max-w-[1200px] mx-auto px-6 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-xl bg-primary flex items-center justify-center text-white font-black text-xl shadow-lg">K</div>
+<div>
+<h1 class="text-xl font-bold leading-tight tracking-tight">KioskIA UI Kit Hub</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Unified Design System &amp; Style Guide</p>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-300">
+<span class="px-3 py-1 rounded-full bg-primary/10 text-primary">v2.4.0</span>
+<span>Last updated: Oct 2023</span>
+</div>
+</div>
+</header>
+<main class="flex-1 w-full max-w-[1200px] mx-auto px-6 py-10 space-y-12">
+<!-- Section 1: Brand Colors -->
+<section class="space-y-6">
+<div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+<span class="material-symbols-outlined text-primary">palette</span>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">1. Brand Colors</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Navy Blue -->
+<div class="flex flex-col gap-3 group">
+<div class="h-32 w-full rounded-2xl bg-[#1E3A8A] shadow-sm relative overflow-hidden group-hover:shadow-md transition-shadow">
+<div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="space-y-1">
+<h3 class="font-bold text-lg">Navy Blue</h3>
+<div class="flex items-center justify-between text-sm">
+<span class="text-slate-500 dark:text-slate-400 font-mono">#1E3A8A</span>
+<span class="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">Primary Brand</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400">Used for headers, text, and trust indicators.</p>
+</div>
+</div>
+<!-- Turquoise -->
+<div class="flex flex-col gap-3 group">
+<div class="h-32 w-full rounded-2xl bg-[#00BFA5] shadow-sm relative overflow-hidden group-hover:shadow-md transition-shadow">
+<div class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="space-y-1">
+<h3 class="font-bold text-lg">Turquoise</h3>
+<div class="flex items-center justify-between text-sm">
+<span class="text-slate-500 dark:text-slate-400 font-mono">#00BFA5</span>
+<span class="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">Secondary / Success</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400">Used for success states and secondary actions.</p>
+</div>
+</div>
+<!-- Premium Orange -->
+<div class="flex flex-col gap-3 group">
+<div class="h-32 w-full rounded-2xl bg-[#FF6803] shadow-sm relative overflow-hidden group-hover:shadow-md transition-shadow">
+<div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="space-y-1">
+<h3 class="font-bold text-lg">Premium Orange</h3>
+<div class="flex items-center justify-between text-sm">
+<span class="text-slate-500 dark:text-slate-400 font-mono">#FF6803</span>
+<span class="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">Accent / Premium</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400">Used for CTAs, highlights, and premium features.</p>
+</div>
+</div>
+<!-- Grayscale -->
+<div class="flex flex-col gap-3 group">
+<div class="h-32 w-full rounded-2xl bg-slate-200 dark:bg-slate-700 shadow-sm relative overflow-hidden flex">
+<div class="flex-1 bg-slate-50"></div>
+<div class="flex-1 bg-slate-200"></div>
+<div class="flex-1 bg-slate-400"></div>
+<div class="flex-1 bg-slate-600"></div>
+<div class="flex-1 bg-slate-900"></div>
+</div>
+<div class="space-y-1">
+<h3 class="font-bold text-lg">Grayscale</h3>
+<div class="flex items-center justify-between text-sm">
+<span class="text-slate-500 dark:text-slate-400 font-mono">Slate 50-900</span>
+<span class="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300">Neutral</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-slate-400">Backgrounds, borders, and body text.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Typography -->
+<section class="space-y-6">
+<div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+<span class="material-symbols-outlined text-primary">text_fields</span>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">2. Typography</h2>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white dark:bg-[#2a1d15] p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800">
+<!-- Poppins Column -->
+<div class="space-y-6">
+<div class="flex items-baseline justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
+<h3 class="text-xl font-bold text-brand-blue dark:text-blue-300">Poppins</h3>
+<span class="text-sm text-slate-400">Headings &amp; Display</span>
+</div>
+<div class="space-y-4 font-poppins">
+<div class="space-y-1">
+<p class="text-4xl font-bold text-slate-900 dark:text-white">H1 Heading</p>
+<p class="text-xs text-slate-400 font-mono">Bold / 36px / 1.2</p>
+</div>
+<div class="space-y-1">
+<p class="text-3xl font-semibold text-slate-900 dark:text-white">H2 Heading</p>
+<p class="text-xs text-slate-400 font-mono">Semibold / 30px / 1.3</p>
+</div>
+<div class="space-y-1">
+<p class="text-2xl font-medium text-slate-900 dark:text-white">H3 Heading</p>
+<p class="text-xs text-slate-400 font-mono">Medium / 24px / 1.4</p>
+</div>
+</div>
+</div>
+<!-- PP Neue Montreal Column -->
+<div class="space-y-6">
+<div class="flex items-baseline justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
+<h3 class="text-xl font-bold text-brand-blue dark:text-blue-300">PP Neue Montreal</h3>
+<span class="text-sm text-slate-400">Body &amp; UI</span>
+</div>
+<div class="space-y-4 font-montreal"> <!-- Fallback used as font-montreal class -->
+<div class="space-y-1">
+<p class="text-base font-medium text-slate-900 dark:text-white">Body Large</p>
+<p class="text-base text-slate-600 dark:text-slate-300">The quick brown fox jumps over the lazy dog. Used for lead paragraphs and main content.</p>
+<p class="text-xs text-slate-400 font-mono mt-1">Medium / 16px / 1.5</p>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-normal text-slate-900 dark:text-white">Body Regular</p>
+<p class="text-sm text-slate-600 dark:text-slate-300">This is the default text style for descriptions, lists, and general reading content across the application.</p>
+<p class="text-xs text-slate-400 font-mono mt-1">Regular / 14px / 1.5</p>
+</div>
+<div class="space-y-1">
+<p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Caption / Label</p>
+<p class="text-xs text-slate-400 font-mono mt-1">Medium / 12px / 1.5 / Uppercase</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Buttons & States -->
+<section class="space-y-6">
+<div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+<span class="material-symbols-outlined text-primary">smart_button</span>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">3. Buttons &amp; States</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Panda 3D (Student/Vendor) -->
+<div class="bg-slate-50 dark:bg-[#2a1d15] p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">school</span>
+<h3 class="font-bold text-lg">Panda 3D Style <span class="text-sm font-normal text-slate-500 ml-2">(Student / Vendor)</span></h3>
+</div>
+<div class="space-y-8">
+<div class="flex flex-wrap items-center gap-6">
+<div class="flex flex-col items-center gap-2">
+<button class="px-8 py-3 bg-primary text-white font-bold rounded-xl shadow-3d hover:translate-y-1 hover:shadow-3d-active transition-all active:translate-y-[4px] active:shadow-none">
+                                        Primary Action
+                                    </button>
+<span class="text-xs text-slate-400">Default / Hover</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="px-8 py-3 bg-secondary text-white font-bold rounded-xl shadow-[0px_4px_0px_0px_#008f7a] hover:translate-y-1 hover:shadow-[0px_2px_0px_0px_#008f7a] transition-all active:translate-y-[4px] active:shadow-none">
+                                        Success Action
+                                    </button>
+<span class="text-xs text-slate-400">Secondary</span>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-6">
+<div class="flex flex-col items-center gap-2">
+<button class="px-8 py-3 bg-primary text-white font-bold rounded-xl shadow-none translate-y-[4px] opacity-90 cursor-default">
+                                        Pressed State
+                                    </button>
+<span class="text-xs text-slate-400">Active / Pressed</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="px-8 py-3 bg-slate-300 text-slate-500 font-bold rounded-xl cursor-not-allowed shadow-none border-b-4 border-slate-400" disabled="">
+                                        Disabled
+                                    </button>
+<span class="text-xs text-slate-400">Disabled</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Minimalist Black (Parent) -->
+<div class="bg-slate-50 dark:bg-[#2a1d15] p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-brand-blue">family_restroom</span>
+<h3 class="font-bold text-lg">Minimalist Style <span class="text-sm font-normal text-slate-500 ml-2">(Parent / Admin)</span></h3>
+</div>
+<div class="space-y-8">
+<div class="flex flex-wrap items-center gap-6">
+<div class="flex flex-col items-center gap-2">
+<button class="px-8 py-3 bg-brand-blue text-white font-medium rounded-full hover:bg-blue-900 transition-colors shadow-sm">
+                                        Admin Action
+                                    </button>
+<span class="text-xs text-slate-400">Default / Hover</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="px-8 py-3 bg-white border border-slate-200 text-slate-900 font-medium rounded-full hover:bg-slate-50 transition-colors shadow-sm">
+                                        Secondary
+                                    </button>
+<span class="text-xs text-slate-400">Outline</span>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-6">
+<div class="flex flex-col items-center gap-2">
+<button class="px-8 py-3 bg-brand-blue text-white font-medium rounded-full ring-4 ring-blue-200 dark:ring-blue-900 transition-all">
+                                        Focused
+                                    </button>
+<span class="text-xs text-slate-400">Focus Ring</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="px-8 py-3 bg-slate-200 text-slate-400 font-medium rounded-full cursor-not-allowed" disabled="">
+                                        Unavailable
+                                    </button>
+<span class="text-xs text-slate-400">Disabled</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Iconography & Cards -->
+<section class="space-y-6">
+<div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+<span class="material-symbols-outlined text-primary">layers</span>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">4. Iconography &amp; Components</h2>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Iconography (Left - 5 cols) -->
+<div class="lg:col-span-5 space-y-6">
+<div class="bg-white dark:bg-[#2a1d15] p-6 rounded-2xl border border-slate-100 dark:border-slate-800 h-full">
+<h3 class="font-bold text-lg mb-6">Icon Systems</h3>
+<div class="space-y-8">
+<div>
+<p class="text-sm font-medium text-slate-500 mb-3 uppercase tracking-wide">Tactile 3D (Student View)</p>
+<div class="flex gap-4">
+<div class="size-16 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 shadow-lg flex items-center justify-center text-white transform hover:scale-105 transition-transform cursor-pointer border-b-4 border-orange-700">
+<span class="material-symbols-outlined text-3xl">lunch_dining</span>
+</div>
+<div class="size-16 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 shadow-lg flex items-center justify-center text-white transform hover:scale-105 transition-transform cursor-pointer border-b-4 border-teal-700">
+<span class="material-symbols-outlined text-3xl">sports_soccer</span>
+</div>
+<div class="size-16 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg flex items-center justify-center text-white transform hover:scale-105 transition-transform cursor-pointer border-b-4 border-blue-700">
+<span class="material-symbols-outlined text-3xl">book</span>
+</div>
+</div>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500 mb-3 uppercase tracking-wide">Minimalist Line (Parent View)</p>
+<div class="flex gap-4">
+<div class="size-12 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:border-brand-blue hover:text-brand-blue transition-colors cursor-pointer">
+<span class="material-symbols-outlined">credit_card</span>
+</div>
+<div class="size-12 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:border-brand-blue hover:text-brand-blue transition-colors cursor-pointer">
+<span class="material-symbols-outlined">notifications</span>
+</div>
+<div class="size-12 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:border-brand-blue hover:text-brand-blue transition-colors cursor-pointer">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<div class="size-12 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:border-brand-blue hover:text-brand-blue transition-colors cursor-pointer">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Cards (Right - 7 cols) -->
+<div class="lg:col-span-7 space-y-6">
+<div class="bg-slate-50 dark:bg-[#2a1d15] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 h-full">
+<h3 class="font-bold text-lg mb-6">Card Architecture</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Student Card Style -->
+<div class="rounded-3xl bg-white dark:bg-[#33251e] p-5 shadow-sm border border-slate-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-md transition-all">
+<div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-primary">fastfood</span>
+</div>
+<div class="flex justify-between items-start mb-4">
+<div class="bg-orange-50 text-orange-600 p-2 rounded-xl">
+<span class="material-symbols-outlined">lunch_dining</span>
+</div>
+<span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-lg">DISPONIBLE</span>
+</div>
+<h4 class="font-bold text-slate-900 dark:text-white text-lg">Combo Escolar</h4>
+<p class="text-sm text-slate-500 mt-1">Sándwich + Jugo + Fruta</p>
+<div class="mt-4 flex items-center justify-between">
+<span class="font-black text-xl text-brand-blue">$4.50</span>
+<button class="size-8 rounded-full bg-primary text-white flex items-center justify-center shadow-md hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+</div>
+</div>
+<!-- Parent Card Style -->
+<div class="rounded-2xl bg-white dark:bg-[#33251e] p-5 shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col justify-between h-full">
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-medium text-slate-500 uppercase">Saldo Actual</span>
+<span class="material-symbols-outlined text-slate-400 text-lg">account_balance_wallet</span>
+</div>
+<h4 class="font-bold text-2xl text-slate-900 dark:text-white">$120.00</h4>
+<p class="text-xs text-slate-400 mt-1">Última recarga: Hoy</p>
+</div>
+<div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 flex gap-2">
+<button class="flex-1 py-2 text-xs font-semibold text-brand-blue bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                                            Recargar
+                                        </button>
+<button class="flex-1 py-2 text-xs font-semibold text-slate-600 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                                            Historial
+                                        </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-white dark:bg-[#2a1d15] border-t border-slate-200 dark:border-slate-800 py-8 px-6 mt-10">
+<div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
+<p>© 2023 KioskIA Payment Ecosystem.</p>
+<div class="flex gap-6">
+<a class="hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="hover:text-primary transition-colors" href="#">Component Library</a>
+<a class="hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</div>
+</footer>
+</div>
+</div>
+</body></html>

@@ -11,6 +11,7 @@ export default function ParentDeposit() {
     const [selectedChild, setSelectedChild] = useState<Id<"students"> | null>(null)
     const [amount, setAmount] = useState('')
     const [reference, setReference] = useState('')
+    const [walletType, setWalletType] = useState<'general' | 'healthy'>('general')
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
     const [error, setError] = useState('')
@@ -26,6 +27,7 @@ export default function ParentDeposit() {
                 studentId: selectedChild,
                 amount: parseInt(amount),
                 reference,
+                walletType,
             })
             setSuccess(true)
             setAmount('')
@@ -90,7 +92,7 @@ export default function ParentDeposit() {
                                     <div>
                                         <p className="font-bold text-sm text-gray-900 dark:text-white">{child.fullName}</p>
                                         <p className="text-xs text-gray-400">{child.grade}</p>
-                                        <p className="text-xs font-bold text-primary">Saldo: ${child.balance.toLocaleString('es-CL')}</p>
+                                        <p className="text-xs font-bold text-primary">Saldo: ${child.generalBalance.toLocaleString('es-CL')}</p>
                                     </div>
                                 </div>
                             </button>
@@ -104,6 +106,22 @@ export default function ParentDeposit() {
                     {/* Amount */}
                     <div className="bg-white dark:bg-surface-dark rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-800">
                         <h3 className="font-bold text-gray-900 dark:text-white mb-3">Monto a Depositar</h3>
+
+                        <div className="flex gap-2 mb-4 bg-gray-50 dark:bg-gray-800/50 p-1 rounded-xl">
+                            <button
+                                onClick={() => setWalletType('general')}
+                                className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${walletType === 'general' ? 'bg-white dark:bg-gray-700 shadow text-primary' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            >
+                                Saldo General
+                            </button>
+                            <button
+                                onClick={() => setWalletType('healthy')}
+                                className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${walletType === 'healthy' ? 'bg-green-50 dark:bg-green-900/30 shadow text-green-600' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            >
+                                Saldo Saludable
+                            </button>
+                        </div>
+
                         <div className="grid grid-cols-3 gap-2 mb-4">
                             {QUICK_AMOUNTS.map(qa => (
                                 <button

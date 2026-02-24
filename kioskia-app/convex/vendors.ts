@@ -39,7 +39,7 @@ export const findStudentByRut = query({
         return {
             _id: student._id,
             fullName: student.fullName,
-            balance: student.balance,
+            generalBalance: student.generalBalance,
             healthyBalance: student.healthyBalance,
             avatarInitials: student.avatarInitials,
             grade: student.grade,
@@ -61,7 +61,30 @@ export const findStudentByQR = query({
         return {
             _id: student._id,
             fullName: student.fullName,
-            balance: student.balance,
+            generalBalance: student.generalBalance,
+            healthyBalance: student.healthyBalance,
+            avatarInitials: student.avatarInitials,
+            grade: student.grade,
+        };
+    },
+});
+
+export const findStudentByBiometric = query({
+    args: { biometricId: v.string() },
+    handler: async (ctx, args) => {
+        const student = await ctx.db
+            .query("students")
+            .withIndex("by_biometricId", (q) => q.eq("biometricId", args.biometricId))
+            .first();
+
+        if (!student) {
+            throw new Error("Estudiante no encontrado");
+        }
+
+        return {
+            _id: student._id,
+            fullName: student.fullName,
+            generalBalance: student.generalBalance,
             healthyBalance: student.healthyBalance,
             avatarInitials: student.avatarInitials,
             grade: student.grade,
@@ -223,16 +246,29 @@ export const processPayment = mutation({
             })
         );
 
-        const total = resolvedItems.reduce(
-            (s, i) => s + i.price * i.qty,
-            0
-        );
-        const unhealthyTotal = resolvedItems
+        const total = resolvedItems.reduce((s, i) => s + i.price * i.qty, 0);
+
+        const healthyItemsTotal = resolvedItems
+            .filter((i) => i.isHealthy)
+            .reduce((s, i) => s + i.price * i.qty, 0);
+
+        const unhealthyItemsTotal = resolvedItems
             .filter((i) => !i.isHealthy)
             .reduce((s, i) => s + i.price * i.qty, 0);
 
-        if (student.balance < total) {
-            throw new Error("Saldo insuficiente");
+        // Calculate minimum required general balance
+        // We use healthyBalance to pay for healthy items first.
+        const healthyCoveredByHealthyBalance = Math.min(student.healthyBalance, healthyItemsTotal);
+        const healthyRemainingToPay = healthyItemsTotal - healthyCoveredByHealthyBalance;
+
+        const requiredGeneralBalance = unhealthyItemsTotal + healthyRemainingToPay;
+
+        if (student.generalBalance < requiredGeneralBalance) {
+            if (student.generalBalance + student.healthyBalance >= total) {
+                throw new Error("Saldo insuficiente: Los productos no saludables solo pueden pagarse con el Saldo General Libre.");
+            } else {
+                throw new Error("Saldo insuficiente");
+            }
         }
 
         // Check consumption limits
@@ -241,41 +277,51 @@ export const processPayment = mutation({
             .withIndex("by_studentId", (q) => q.eq("studentId", student._id))
             .first();
 
-        if (limit?.enabled && unhealthyTotal > 0) {
+        if (limit?.enabled && unhealthyItemsTotal > 0) {
             const maxUnhealthy = Math.round(
-                (student.balance * limit.unhealthyPercent) / 100
+                (student.generalBalance * limit.unhealthyPercent) / 100
             );
-            if (unhealthyTotal > maxUnhealthy) {
-                throw new Error("Supera el límite de productos no saludables");
+            if (unhealthyItemsTotal > maxUnhealthy) {
+                throw new Error(`Supera el límite de $${maxUnhealthy.toLocaleString('es-CL')} para productos no saludables.`);
             }
         }
 
         // Update balance
-        const healthyTotal = resolvedItems
-            .filter((i) => i.isHealthy)
-            .reduce((s, i) => s + i.price * i.qty, 0);
-        const newBalance = student.balance - total;
-        const newHealthyBalance = Math.max(0, student.healthyBalance - healthyTotal);
+        const newHealthyBalance = student.healthyBalance - healthyCoveredByHealthyBalance;
+        const newGeneralBalance = student.generalBalance - requiredGeneralBalance;
 
         await ctx.db.patch(student._id, {
-            balance: newBalance,
+            generalBalance: newGeneralBalance,
             healthyBalance: newHealthyBalance,
         });
 
         // Create transaction records
+        let currentGeneral = student.generalBalance;
+        let currentHealthy = student.healthyBalance;
+
         for (let i = 0; i < resolvedItems.length; i++) {
             const item = resolvedItems[i];
-            const remainingAfter = resolvedItems
-                .slice(i + 1)
-                .reduce((s, x) => s + x.price * x.qty, 0);
+            const itemCost = item.price * item.qty;
+            let displayBalanceAfter = 0;
+
+            if (item.isHealthy) {
+                const debitFromHealthy = Math.min(currentHealthy, itemCost);
+                const debitFromGeneral = itemCost - debitFromHealthy;
+                currentHealthy -= debitFromHealthy;
+                currentGeneral -= debitFromGeneral;
+                displayBalanceAfter = currentGeneral + currentHealthy;
+            } else {
+                currentGeneral -= itemCost;
+                displayBalanceAfter = currentGeneral + currentHealthy;
+            }
 
             await ctx.db.insert("transactions", {
                 studentId: student._id,
                 vendorId: vendor._id,
                 type: "compra",
                 description: item.name,
-                amount: -(item.price * item.qty),
-                balanceAfter: newBalance + remainingAfter,
+                amount: -itemCost,
+                balanceAfter: displayBalanceAfter,
                 isHealthy: item.isHealthy,
                 category: item.category,
                 icon: item.icon,

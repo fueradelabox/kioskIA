@@ -186,20 +186,29 @@ export const rechargeBalance = mutation({
     args: {
         studentId: v.id("students"),
         amount: v.number(),
+        walletType: v.optional(v.union(v.literal("general"), v.literal("healthy"))),
     },
     handler: async (ctx, args) => {
         const student = await ctx.db.get(args.studentId);
         if (!student) throw new Error("Estudiante no encontrado");
 
-        const newBalance = student.balance + args.amount;
-        await ctx.db.patch(args.studentId, { balance: newBalance });
+        const isHealthy = args.walletType === "healthy";
+        const newBalance = isHealthy
+            ? student.healthyBalance + args.amount
+            : student.generalBalance + args.amount;
+
+        if (isHealthy) {
+            await ctx.db.patch(args.studentId, { healthyBalance: newBalance });
+        } else {
+            await ctx.db.patch(args.studentId, { generalBalance: newBalance });
+        }
 
         await ctx.db.insert("transactions", {
             studentId: args.studentId,
             type: "recarga",
-            description: "Recarga de saldo",
+            description: `Recarga de saldo ${isHealthy ? "saludable" : "general"}`,
             amount: args.amount,
-            balanceAfter: newBalance,
+            balanceAfter: isHealthy ? student.generalBalance : newBalance, // Representing general balance is standard
             icon: "account_balance_wallet",
             category: "Recarga",
         });
@@ -212,6 +221,7 @@ export const createDeposit = mutation({
         studentId: v.id("students"),
         amount: v.number(),
         reference: v.string(),
+        walletType: v.optional(v.union(v.literal("general"), v.literal("healthy"))),
     },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
@@ -243,15 +253,23 @@ export const createDeposit = mutation({
         const student = await ctx.db.get(args.studentId);
         if (!student) throw new Error("Estudiante no encontrado");
 
-        const newBalance = student.balance + args.amount;
-        await ctx.db.patch(args.studentId, { balance: newBalance });
+        const isHealthy = args.walletType === "healthy";
+        const newBalance = isHealthy
+            ? student.healthyBalance + args.amount
+            : student.generalBalance + args.amount;
+
+        if (isHealthy) {
+            await ctx.db.patch(args.studentId, { healthyBalance: newBalance });
+        } else {
+            await ctx.db.patch(args.studentId, { generalBalance: newBalance });
+        }
 
         await ctx.db.insert("transactions", {
             studentId: args.studentId,
             type: "recarga",
-            description: `Depósito transferencia - Ref: ${args.reference}`,
+            description: `Depósito ${isHealthy ? "saludable" : "general"} - Ref: ${args.reference}`,
             amount: args.amount,
-            balanceAfter: newBalance,
+            balanceAfter: isHealthy ? student.generalBalance : newBalance,
             icon: "account_balance",
             category: "Recarga",
         });
