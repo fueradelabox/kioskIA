@@ -8,10 +8,37 @@ export const getProfile = query({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) return null;
 
-        // Find users by email, iterate to find one with a student profile
-        const email = identity.email;
-        if (!email) return null;
+        // Strategy 1: Use the subject (user ID) from the identity token
+        // The subject in @convex-dev/auth is the user ID
+        const tokenIdentifier = identity.tokenIdentifier;
+        const subject = identity.subject;
 
+        // Try to find user directly by auth account userId
+        // First, check authAccounts to get the email
+        const authAccounts = await ctx.db.query("authAccounts").collect();
+        let authEmail: string | undefined;
+        let authUserId: string | undefined;
+
+        for (const account of authAccounts) {
+            // The subject or tokenIdentifier contains the userId
+            if (String(account.userId) === subject || tokenIdentifier?.includes(String(account.userId))) {
+                authEmail = account.providerAccountId; // This is the email for resend provider
+                authUserId = String(account.userId);
+                break;
+            }
+        }
+
+        // Strategy 2: Also try identity.email if available
+        const email = identity.email ?? authEmail;
+
+        if (!email) {
+            console.log("[getProfile] No email found from identity or authAccounts");
+            return null;
+        }
+
+        console.log("[getProfile] Resolved email:", email, "authUserId:", authUserId);
+
+        // Look up ALL users with this email
         const users = await ctx.db
             .query("users")
             .filter((q) => q.eq(q.field("email"), email))
@@ -23,6 +50,7 @@ export const getProfile = query({
                 .withIndex("by_userId", (q) => q.eq("userId", user._id))
                 .first();
             if (student) {
+                console.log("[getProfile] Found student:", student.fullName, "via userId:", String(user._id));
                 return {
                     ...student,
                     generalBalance: student.generalBalance ?? (student as any).balance ?? 0,
@@ -45,6 +73,7 @@ export const getProfile = query({
                 avatarInitials: studentByEmail.avatarInitials ?? studentByEmail.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase(),
             };
         }
+        console.log("[getProfile] NO student found for email:", email);
         return null;
     },
 });
