@@ -16,7 +16,7 @@ export default function VendorLogin() {
         setLoading(true)
 
         try {
-            await signIn('resend', { email })
+            await signIn('resend', { email, redirectTo: '/vendedor' })
             setSent(true)
         } catch (err: unknown) {
             setError((err as Error)?.message || 'Error al enviar el enlace mágico')

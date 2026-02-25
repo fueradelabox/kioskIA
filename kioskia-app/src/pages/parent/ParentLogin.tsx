@@ -16,7 +16,7 @@ export default function ParentLogin() {
         setLoading(true)
 
         try {
-            await signIn('resend', { email })
+            await signIn('resend', { email, redirectTo: '/padre' })
             setSent(true)
         } catch (err: unknown) {
             setError((err as Error)?.message || 'Error al enviar el enlace mágico')
