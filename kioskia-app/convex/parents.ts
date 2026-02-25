@@ -8,10 +8,21 @@ export const getChildren = query({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) return [];
 
-        const user = await ctx.db
+        let authEmail = identity.email;
+        if (!authEmail) {
+            const authAccounts = await ctx.db.query("authAccounts").collect();
+            for (const account of authAccounts) {
+                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
+                    authEmail = account.providerAccountId;
+                    break;
+                }
+            }
+        }
+
+        const user = authEmail ? await ctx.db
             .query("users")
-            .filter((q) => q.eq(q.field("email"), identity.email))
-            .first();
+            .filter((q) => q.eq(q.field("email"), authEmail))
+            .first() : null;
         if (!user) return [];
 
         const parent = await ctx.db
@@ -123,10 +134,21 @@ export const getProfile = query({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) return null;
 
-        const user = await ctx.db
+        let authEmail = identity.email;
+        if (!authEmail) {
+            const authAccounts = await ctx.db.query("authAccounts").collect();
+            for (const account of authAccounts) {
+                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
+                    authEmail = account.providerAccountId;
+                    break;
+                }
+            }
+        }
+
+        const user = authEmail ? await ctx.db
             .query("users")
-            .filter((q) => q.eq(q.field("email"), identity.email))
-            .first();
+            .filter((q) => q.eq(q.field("email"), authEmail))
+            .first() : null;
         if (!user) return null;
 
         return await ctx.db
@@ -147,10 +169,21 @@ export const updateConsumptionLimit = mutation({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("No autenticado");
 
-        const user = await ctx.db
+        let authEmail = identity.email;
+        if (!authEmail) {
+            const authAccounts = await ctx.db.query("authAccounts").collect();
+            for (const account of authAccounts) {
+                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
+                    authEmail = account.providerAccountId;
+                    break;
+                }
+            }
+        }
+
+        const user = authEmail ? await ctx.db
             .query("users")
-            .filter((q) => q.eq(q.field("email"), identity.email))
-            .first();
+            .filter((q) => q.eq(q.field("email"), authEmail))
+            .first() : null;
         if (!user) throw new Error("Usuario no encontrado");
 
         const parent = await ctx.db
@@ -227,10 +260,21 @@ export const createDeposit = mutation({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("No autenticado");
 
-        const user = await ctx.db
+        let authEmail = identity.email;
+        if (!authEmail) {
+            const authAccounts = await ctx.db.query("authAccounts").collect();
+            for (const account of authAccounts) {
+                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
+                    authEmail = account.providerAccountId;
+                    break;
+                }
+            }
+        }
+
+        const user = authEmail ? await ctx.db
             .query("users")
-            .filter((q) => q.eq(q.field("email"), identity.email))
-            .first();
+            .filter((q) => q.eq(q.field("email"), authEmail))
+            .first() : null;
         if (!user) throw new Error("Usuario no encontrado");
 
         const parent = await ctx.db
@@ -285,10 +329,21 @@ export const getDeposits = query({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) return [];
 
-        const user = await ctx.db
+        let authEmail = identity.email;
+        if (!authEmail) {
+            const authAccounts = await ctx.db.query("authAccounts").collect();
+            for (const account of authAccounts) {
+                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
+                    authEmail = account.providerAccountId;
+                    break;
+                }
+            }
+        }
+
+        const user = authEmail ? await ctx.db
             .query("users")
-            .filter((q) => q.eq(q.field("email"), identity.email))
-            .first();
+            .filter((q) => q.eq(q.field("email"), authEmail))
+            .first() : null;
         if (!user) return [];
 
         const parent = await ctx.db
@@ -433,10 +488,21 @@ export const getNotifications = query({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) return [];
 
-        const user = await ctx.db
+        let authEmail = identity.email;
+        if (!authEmail) {
+            const authAccounts = await ctx.db.query("authAccounts").collect();
+            for (const account of authAccounts) {
+                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
+                    authEmail = account.providerAccountId;
+                    break;
+                }
+            }
+        }
+
+        const user = authEmail ? await ctx.db
             .query("users")
-            .filter((q) => q.eq(q.field("email"), identity.email))
-            .first();
+            .filter((q) => q.eq(q.field("email"), authEmail))
+            .first() : null;
         if (!user) return [];
 
         return await ctx.db
@@ -462,10 +528,21 @@ export const markAllNotificationsRead = mutation({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("No autenticado");
 
-        const user = await ctx.db
+        let authEmail = identity.email;
+        if (!authEmail) {
+            const authAccounts = await ctx.db.query("authAccounts").collect();
+            for (const account of authAccounts) {
+                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
+                    authEmail = account.providerAccountId;
+                    break;
+                }
+            }
+        }
+
+        const user = authEmail ? await ctx.db
             .query("users")
-            .filter((q) => q.eq(q.field("email"), identity.email))
-            .first();
+            .filter((q) => q.eq(q.field("email"), authEmail))
+            .first() : null;
         if (!user) throw new Error("Usuario no encontrado");
 
         const notifications = await ctx.db
@@ -505,10 +582,21 @@ export const createSubscription = mutation({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("No autenticado");
 
-        const user = await ctx.db
+        let authEmail = identity.email;
+        if (!authEmail) {
+            const authAccounts = await ctx.db.query("authAccounts").collect();
+            for (const account of authAccounts) {
+                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
+                    authEmail = account.providerAccountId;
+                    break;
+                }
+            }
+        }
+
+        const user = authEmail ? await ctx.db
             .query("users")
-            .filter((q) => q.eq(q.field("email"), identity.email))
-            .first();
+            .filter((q) => q.eq(q.field("email"), authEmail))
+            .first() : null;
         if (!user) throw new Error("Usuario no encontrado");
 
         const parent = await ctx.db
