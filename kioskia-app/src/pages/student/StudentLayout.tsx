@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Outlet, NavLink } from 'react-router-dom'
 import { useDarkMode } from '../../context/DarkModeContext'
 import { useStudentProfile } from '../../hooks/useStudentData'
 import { useAuth } from '../../context/AuthContext'
@@ -20,7 +20,6 @@ const explorerNavItems = [
 ]
 
 export default function StudentLayout() {
-    const navigate = useNavigate()
     const { darkMode, toggleDarkMode } = useDarkMode()
     const { signOut } = useAuth()
     const student = useStudentProfile()

@@ -181,7 +181,6 @@ export default function VendorPOS() {
 
     const handleLogout = async () => {
         await signOut()
-        navigate('/')
     }
 
     if (loading) {
