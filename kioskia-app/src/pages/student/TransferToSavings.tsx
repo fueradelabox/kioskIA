@@ -5,7 +5,7 @@ import { useStudentProfile, useSavingsGoal, useTransferToSavings } from '../../h
 export default function TransferToSavings() {
     const navigate = useNavigate()
     const student = useStudentProfile()
-    const goal = useSavingsGoal()
+    const goal = useSavingsGoal(student?._id)
     const transferToSavings = useTransferToSavings()
     const [amount, setAmount] = useState('')
     const [saving, setSaving] = useState(false)

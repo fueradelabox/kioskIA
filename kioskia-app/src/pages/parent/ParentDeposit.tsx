@@ -5,9 +5,11 @@ import type { Id } from '../../../convex/_generated/dataModel'
 
 export default function ParentDeposit() {
     const navigate = useNavigate()
-    const children = useChildren()
+    const childrenData = useChildren()
+    const children = childrenData ?? []
     const createDeposit = useCreateDeposit()
-    const deposits = useDeposits()
+    const depositsData = useDeposits()
+    const deposits = depositsData ?? []
     const [selectedChild, setSelectedChild] = useState<Id<"students"> | null>(null)
     const [amount, setAmount] = useState('')
     const [reference, setReference] = useState('')
@@ -92,7 +94,7 @@ export default function ParentDeposit() {
                                     <div>
                                         <p className="font-bold text-sm text-gray-900 dark:text-white">{child.fullName}</p>
                                         <p className="text-xs text-gray-400">{child.grade}</p>
-                                        <p className="text-xs font-bold text-primary">Saldo: ${child.generalBalance.toLocaleString('es-CL')}</p>
+                                        <p className="text-xs font-bold text-primary">Saldo: ${(child.generalBalance || 0).toLocaleString('es-CL')}</p>
                                     </div>
                                 </div>
                             </button>

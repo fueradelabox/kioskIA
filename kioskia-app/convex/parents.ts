@@ -1,52 +1,90 @@
 import { query, mutation } from "./_generated/server";
+import type { QueryCtx, MutationCtx } from "./_generated/server";
 import { v } from "convex/values";
+
+// ─── SHARED AUTH HELPER ───────────────────────────────────────────
+// Resolves the current user's email from identity + authAccounts fallback,
+// then finds the parent profile linked to that email.
+//
+// Key challenge: When a parent logs in via Resend, Convex Auth may create
+// a NEW users record. But the parents table points to the ORIGINAL user
+// (created via seed or admin). So we must:
+// 1. Get the email from auth identity / authAccounts
+// 2. Find ALL users with that email
+// 3. Check each one for a parent profile
+// 4. Fallback: check parents table directly by email
+
+async function resolveParent(ctx: QueryCtx | MutationCtx) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    // Step 1: Resolve email from identity + authAccounts
+    const tokenIdentifier = identity.tokenIdentifier;
+    const subject = identity.subject;
+
+    // Always check authAccounts for the canonical email
+    const authAccounts = await ctx.db.query("authAccounts").collect();
+    let authEmail: string | undefined;
+
+    for (const account of authAccounts) {
+        if (
+            String(account.userId) === subject ||
+            tokenIdentifier?.includes(String(account.userId))
+        ) {
+            authEmail = account.providerAccountId;
+            break;
+        }
+    }
+
+    const email = identity.email ?? authEmail;
+    if (!email) return null;
+
+    // Step 2: Find ALL users with this email and check for parent profile
+    const usersWithEmail = await ctx.db
+        .query("users")
+        .filter((q) => q.eq(q.field("email"), email))
+        .collect();
+
+    for (const u of usersWithEmail) {
+        const p = await ctx.db
+            .query("parents")
+            .withIndex("by_userId", (q) => q.eq("userId", u._id))
+            .first();
+        if (p) {
+            return { user: u, parent: p };
+        }
+    }
+
+    // Step 3: Fallback — look up parent directly by email field
+    // This handles the case where the parent was created with an email
+    // but the users table mapping doesn't match
+    const parentByEmail = await ctx.db
+        .query("parents")
+        .filter((q) => q.eq(q.field("email"), email))
+        .first();
+    if (parentByEmail) {
+        // Get the user record associated with this parent
+        const parentUser = await ctx.db.get(parentByEmail.userId);
+        if (parentUser) {
+            return { user: parentUser, parent: parentByEmail };
+        }
+    }
+
+    return null;
+}
+
+// ─── QUERIES ──────────────────────────────────────────────────────
 
 /** Get all children linked to the logged-in parent */
 export const getChildren = query({
     args: {},
     handler: async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) return [];
-
-        let authEmail = identity.email;
-        if (!authEmail) {
-            const authAccounts = await ctx.db.query("authAccounts").collect();
-            for (const account of authAccounts) {
-                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
-                    authEmail = account.providerAccountId;
-                    break;
-                }
-            }
-        }
-
-        let user = null;
-        let _parentProfile = null;
-        if (authEmail) {
-            const usersWithEmail = await ctx.db
-                .query("users")
-                .filter((q) => q.eq(q.field("email"), authEmail))
-                .collect();
-            
-            for (const u of usersWithEmail) {
-                const p = await ctx.db
-                    .query("parents")
-                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
-                    .first();
-                if (p) {
-                    user = u;
-                    _parentProfile = p;
-                    break;
-                }
-            }
-        }
-        if (!user) return [];
-
-        const parent = _parentProfile;
-        if (!parent) return [];
+        const resolved = await resolveParent(ctx);
+        if (!resolved) return [];
 
         const links = await ctx.db
             .query("parentStudents")
-            .withIndex("by_parentId", (q) => q.eq("parentId", parent._id))
+            .withIndex("by_parentId", (q) => q.eq("parentId", resolved.parent._id))
             .collect();
 
         const children = await Promise.all(
@@ -144,236 +182,9 @@ export const getChildSpendingSummary = query({
 export const getProfile = query({
     args: {},
     handler: async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) return null;
-
-        let authEmail = identity.email;
-        if (!authEmail) {
-            const authAccounts = await ctx.db.query("authAccounts").collect();
-            for (const account of authAccounts) {
-                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
-                    authEmail = account.providerAccountId;
-                    break;
-                }
-            }
-        }
-
-        let user = null;
-        let _parentProfile = null;
-        if (authEmail) {
-            const usersWithEmail = await ctx.db
-                .query("users")
-                .filter((q) => q.eq(q.field("email"), authEmail))
-                .collect();
-            
-            for (const u of usersWithEmail) {
-                const p = await ctx.db
-                    .query("parents")
-                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
-                    .first();
-                if (p) {
-                    user = u;
-                    _parentProfile = p;
-                    break;
-                }
-            }
-        }
-        if (!user) return null;
-
-        return await ctx.db
-            .query("parents")
-            .withIndex("by_userId", (q) => q.eq("userId", user._id))
-            .first();
-    },
-});
-
-/** Update consumption limits for a child */
-export const updateConsumptionLimit = mutation({
-    args: {
-        studentId: v.id("students"),
-        enabled: v.boolean(),
-        unhealthyPercent: v.number(),
-    },
-    handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) throw new Error("No autenticado");
-
-        let authEmail = identity.email;
-        if (!authEmail) {
-            const authAccounts = await ctx.db.query("authAccounts").collect();
-            for (const account of authAccounts) {
-                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
-                    authEmail = account.providerAccountId;
-                    break;
-                }
-            }
-        }
-
-        let user = null;
-        let _parentProfile = null;
-        if (authEmail) {
-            const usersWithEmail = await ctx.db
-                .query("users")
-                .filter((q) => q.eq(q.field("email"), authEmail))
-                .collect();
-            
-            for (const u of usersWithEmail) {
-                const p = await ctx.db
-                    .query("parents")
-                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
-                    .first();
-                if (p) {
-                    user = u;
-                    _parentProfile = p;
-                    break;
-                }
-            }
-        }
-        if (!user) throw new Error("Usuario no encontrado");
-
-        const parent = _parentProfile;
-        if (!parent) throw new Error("Perfil de padre no encontrado");
-
-        const existing = await ctx.db
-            .query("consumptionLimits")
-            .withIndex("by_studentId", (q) => q.eq("studentId", args.studentId))
-            .first();
-
-        if (existing) {
-            await ctx.db.patch(existing._id, {
-                enabled: args.enabled,
-                unhealthyPercent: args.unhealthyPercent,
-                setBy: parent._id,
-            });
-        } else {
-            await ctx.db.insert("consumptionLimits", {
-                studentId: args.studentId,
-                enabled: args.enabled,
-                unhealthyPercent: args.unhealthyPercent,
-                setBy: parent._id,
-            });
-        }
-    },
-});
-
-/** Recharge student balance */
-export const rechargeBalance = mutation({
-    args: {
-        studentId: v.id("students"),
-        amount: v.number(),
-        walletType: v.optional(v.union(v.literal("general"), v.literal("healthy"))),
-    },
-    handler: async (ctx, args) => {
-        const student = await ctx.db.get(args.studentId);
-        if (!student) throw new Error("Estudiante no encontrado");
-
-        const isHealthy = args.walletType === "healthy";
-        const newBalance = isHealthy
-            ? student.healthyBalance + args.amount
-            : student.generalBalance + args.amount;
-
-        if (isHealthy) {
-            await ctx.db.patch(args.studentId, { healthyBalance: newBalance });
-        } else {
-            await ctx.db.patch(args.studentId, { generalBalance: newBalance });
-        }
-
-        await ctx.db.insert("transactions", {
-            studentId: args.studentId,
-            type: "recarga",
-            description: `Recarga de saldo ${isHealthy ? "saludable" : "general"}`,
-            amount: args.amount,
-            balanceAfter: isHealthy ? student.generalBalance : newBalance, // Representing general balance is standard
-            icon: "account_balance_wallet",
-            category: "Recarga",
-        });
-    },
-});
-
-/** Create a deposit (bank transfer) */
-export const createDeposit = mutation({
-    args: {
-        studentId: v.id("students"),
-        amount: v.number(),
-        reference: v.string(),
-        walletType: v.optional(v.union(v.literal("general"), v.literal("healthy"))),
-    },
-    handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) throw new Error("No autenticado");
-
-        let authEmail = identity.email;
-        if (!authEmail) {
-            const authAccounts = await ctx.db.query("authAccounts").collect();
-            for (const account of authAccounts) {
-                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
-                    authEmail = account.providerAccountId;
-                    break;
-                }
-            }
-        }
-
-        let user = null;
-        let _parentProfile = null;
-        if (authEmail) {
-            const usersWithEmail = await ctx.db
-                .query("users")
-                .filter((q) => q.eq(q.field("email"), authEmail))
-                .collect();
-            
-            for (const u of usersWithEmail) {
-                const p = await ctx.db
-                    .query("parents")
-                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
-                    .first();
-                if (p) {
-                    user = u;
-                    _parentProfile = p;
-                    break;
-                }
-            }
-        }
-        if (!user) throw new Error("Usuario no encontrado");
-
-        const parent = _parentProfile;
-        if (!parent) throw new Error("Perfil de padre no encontrado");
-
-        // Create the deposit record
-        await ctx.db.insert("deposits", {
-            parentId: parent._id,
-            studentId: args.studentId,
-            amount: args.amount,
-            method: "transfer",
-            reference: args.reference,
-            status: "pending",
-        });
-
-        // For now, auto-confirm and add balance immediately
-        const student = await ctx.db.get(args.studentId);
-        if (!student) throw new Error("Estudiante no encontrado");
-
-        const isHealthy = args.walletType === "healthy";
-        const newBalance = isHealthy
-            ? student.healthyBalance + args.amount
-            : student.generalBalance + args.amount;
-
-        if (isHealthy) {
-            await ctx.db.patch(args.studentId, { healthyBalance: newBalance });
-        } else {
-            await ctx.db.patch(args.studentId, { generalBalance: newBalance });
-        }
-
-        await ctx.db.insert("transactions", {
-            studentId: args.studentId,
-            type: "recarga",
-            description: `Depósito ${isHealthy ? "saludable" : "general"} - Ref: ${args.reference}`,
-            amount: args.amount,
-            balanceAfter: isHealthy ? student.generalBalance : newBalance,
-            icon: "account_balance",
-            category: "Recarga",
-        });
-
-        return { success: true };
+        const resolved = await resolveParent(ctx);
+        if (!resolved) return null;
+        return resolved.parent;
     },
 });
 
@@ -381,82 +192,16 @@ export const createDeposit = mutation({
 export const getDeposits = query({
     args: {},
     handler: async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) return [];
-
-        let authEmail = identity.email;
-        if (!authEmail) {
-            const authAccounts = await ctx.db.query("authAccounts").collect();
-            for (const account of authAccounts) {
-                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
-                    authEmail = account.providerAccountId;
-                    break;
-                }
-            }
-        }
-
-        let user = null;
-        let _parentProfile = null;
-        if (authEmail) {
-            const usersWithEmail = await ctx.db
-                .query("users")
-                .filter((q) => q.eq(q.field("email"), authEmail))
-                .collect();
-            
-            for (const u of usersWithEmail) {
-                const p = await ctx.db
-                    .query("parents")
-                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
-                    .first();
-                if (p) {
-                    user = u;
-                    _parentProfile = p;
-                    break;
-                }
-            }
-        }
-        if (!user) return [];
-
-        const parent = _parentProfile;
-        if (!parent) return [];
+        const resolved = await resolveParent(ctx);
+        if (!resolved) return [];
 
         return await ctx.db
             .query("deposits")
-            .withIndex("by_parentId", (q) => q.eq("parentId", parent._id))
+            .withIndex("by_parentId", (q) => q.eq("parentId", resolved.parent._id))
             .order("desc")
             .take(50);
     },
 });
-
-/** Reward savings — parent adds a bonus to child's savings goal */
-export const rewardSavings = mutation({
-    args: {
-        studentId: v.id("students"),
-        goalId: v.id("savingsGoals"),
-        amount: v.number(),
-        message: v.optional(v.string()),
-    },
-    handler: async (ctx, args) => {
-        const goal = await ctx.db.get(args.goalId);
-        if (!goal) throw new Error("Meta de ahorro no encontrada");
-
-        await ctx.db.patch(args.goalId, {
-            currentAmount: goal.currentAmount + args.amount,
-        });
-
-        await ctx.db.insert("transactions", {
-            studentId: args.studentId,
-            type: "premio",
-            description: args.message || "Premio de ahorro",
-            amount: args.amount,
-            balanceAfter: 0,
-            icon: "stars",
-            category: "Premio",
-        });
-    },
-});
-
-// ─── GROUP 2: NEW QUERIES & MUTATIONS ───────────────────────────
 
 /** Get savings goals for a specific child */
 export const getChildSavingsGoals = query({
@@ -467,24 +212,6 @@ export const getChildSavingsGoals = query({
             .withIndex("by_studentId", (q) => q.eq("studentId", args.studentId))
             .order("desc")
             .collect();
-    },
-});
-
-/** Approve or reject a savings goal */
-export const approveGoal = mutation({
-    args: {
-        goalId: v.id("savingsGoals"),
-        approved: v.boolean(),
-    },
-    handler: async (ctx, args) => {
-        const goal = await ctx.db.get(args.goalId);
-        if (!goal) throw new Error("Meta no encontrada");
-
-        await ctx.db.patch(args.goalId, {
-            active: args.approved,
-        });
-
-        return { success: true };
     },
 });
 
@@ -553,108 +280,14 @@ export const getMonthlyAnalysis = query({
 export const getNotifications = query({
     args: {},
     handler: async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) return [];
-
-        let authEmail = identity.email;
-        if (!authEmail) {
-            const authAccounts = await ctx.db.query("authAccounts").collect();
-            for (const account of authAccounts) {
-                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
-                    authEmail = account.providerAccountId;
-                    break;
-                }
-            }
-        }
-
-        let user = null;
-        let _parentProfile = null;
-        if (authEmail) {
-            const usersWithEmail = await ctx.db
-                .query("users")
-                .filter((q) => q.eq(q.field("email"), authEmail))
-                .collect();
-            
-            for (const u of usersWithEmail) {
-                const p = await ctx.db
-                    .query("parents")
-                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
-                    .first();
-                if (p) {
-                    user = u;
-                    _parentProfile = p;
-                    break;
-                }
-            }
-        }
-        if (!user) return [];
+        const resolved = await resolveParent(ctx);
+        if (!resolved) return [];
 
         return await ctx.db
             .query("notifications")
-            .withIndex("by_userId", (q) => q.eq("userId", user._id))
+            .withIndex("by_userId", (q) => q.eq("userId", resolved.user._id))
             .order("desc")
             .take(50);
-    },
-});
-
-/** Mark a notification as read */
-export const markNotificationRead = mutation({
-    args: { notificationId: v.id("notifications") },
-    handler: async (ctx, args) => {
-        await ctx.db.patch(args.notificationId, { read: true });
-    },
-});
-
-/** Mark all notifications as read */
-export const markAllNotificationsRead = mutation({
-    args: {},
-    handler: async (ctx) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) throw new Error("No autenticado");
-
-        let authEmail = identity.email;
-        if (!authEmail) {
-            const authAccounts = await ctx.db.query("authAccounts").collect();
-            for (const account of authAccounts) {
-                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
-                    authEmail = account.providerAccountId;
-                    break;
-                }
-            }
-        }
-
-        let user = null;
-        let _parentProfile = null;
-        if (authEmail) {
-            const usersWithEmail = await ctx.db
-                .query("users")
-                .filter((q) => q.eq(q.field("email"), authEmail))
-                .collect();
-            
-            for (const u of usersWithEmail) {
-                const p = await ctx.db
-                    .query("parents")
-                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
-                    .first();
-                if (p) {
-                    user = u;
-                    _parentProfile = p;
-                    break;
-                }
-            }
-        }
-        if (!user) throw new Error("Usuario no encontrado");
-
-        const notifications = await ctx.db
-            .query("notifications")
-            .withIndex("by_userId", (q) => q.eq("userId", user._id))
-            .collect();
-
-        await Promise.all(
-            notifications
-                .filter((n) => !n.read)
-                .map((n) => ctx.db.patch(n._id, { read: true }))
-        );
     },
 });
 
@@ -670,6 +303,202 @@ export const getSubscriptions = query({
     },
 });
 
+// ─── MUTATIONS ────────────────────────────────────────────────────
+
+/** Update consumption limits for a child */
+export const updateConsumptionLimit = mutation({
+    args: {
+        studentId: v.id("students"),
+        enabled: v.boolean(),
+        unhealthyPercent: v.number(),
+    },
+    handler: async (ctx, args) => {
+        const resolved = await resolveParent(ctx);
+        if (!resolved) throw new Error("No autenticado o perfil de padre no encontrado");
+
+        const existing = await ctx.db
+            .query("consumptionLimits")
+            .withIndex("by_studentId", (q) => q.eq("studentId", args.studentId))
+            .first();
+
+        if (existing) {
+            await ctx.db.patch(existing._id, {
+                enabled: args.enabled,
+                unhealthyPercent: args.unhealthyPercent,
+                setBy: resolved.parent._id,
+            });
+        } else {
+            await ctx.db.insert("consumptionLimits", {
+                studentId: args.studentId,
+                enabled: args.enabled,
+                unhealthyPercent: args.unhealthyPercent,
+                setBy: resolved.parent._id,
+            });
+        }
+    },
+});
+
+/** Recharge student balance */
+export const rechargeBalance = mutation({
+    args: {
+        studentId: v.id("students"),
+        amount: v.number(),
+        walletType: v.optional(v.union(v.literal("general"), v.literal("healthy"))),
+    },
+    handler: async (ctx, args) => {
+        const student = await ctx.db.get(args.studentId);
+        if (!student) throw new Error("Estudiante no encontrado");
+
+        const isHealthy = args.walletType === "healthy";
+        const currentBalance = isHealthy
+            ? (student.healthyBalance ?? 0)
+            : (student.generalBalance ?? 0);
+        const newBalance = currentBalance + args.amount;
+
+        if (isHealthy) {
+            await ctx.db.patch(args.studentId, { healthyBalance: newBalance });
+        } else {
+            await ctx.db.patch(args.studentId, { generalBalance: newBalance });
+        }
+
+        await ctx.db.insert("transactions", {
+            studentId: args.studentId,
+            type: "recarga",
+            description: `Recarga de saldo ${isHealthy ? "saludable" : "general"}`,
+            amount: args.amount,
+            balanceAfter: newBalance,
+            icon: "account_balance_wallet",
+            category: "Recarga",
+        });
+    },
+});
+
+/** Create a deposit (bank transfer) */
+export const createDeposit = mutation({
+    args: {
+        studentId: v.id("students"),
+        amount: v.number(),
+        reference: v.string(),
+        walletType: v.optional(v.union(v.literal("general"), v.literal("healthy"))),
+    },
+    handler: async (ctx, args) => {
+        const resolved = await resolveParent(ctx);
+        if (!resolved) throw new Error("No autenticado o perfil de padre no encontrado");
+
+        // Create the deposit record
+        await ctx.db.insert("deposits", {
+            parentId: resolved.parent._id,
+            studentId: args.studentId,
+            amount: args.amount,
+            method: "transfer",
+            reference: args.reference,
+            status: "pending",
+        });
+
+        // For now, auto-confirm and add balance immediately
+        const student = await ctx.db.get(args.studentId);
+        if (!student) throw new Error("Estudiante no encontrado");
+
+        const isHealthy = args.walletType === "healthy";
+        const currentBalance = isHealthy
+            ? (student.healthyBalance ?? 0)
+            : (student.generalBalance ?? 0);
+        const newBalance = currentBalance + args.amount;
+
+        if (isHealthy) {
+            await ctx.db.patch(args.studentId, { healthyBalance: newBalance });
+        } else {
+            await ctx.db.patch(args.studentId, { generalBalance: newBalance });
+        }
+
+        await ctx.db.insert("transactions", {
+            studentId: args.studentId,
+            type: "recarga",
+            description: `Depósito ${isHealthy ? "saludable" : "general"} - Ref: ${args.reference}`,
+            amount: args.amount,
+            balanceAfter: newBalance,
+            icon: "account_balance",
+            category: "Recarga",
+        });
+
+        return { success: true };
+    },
+});
+
+/** Reward savings — parent adds a bonus to child's savings goal */
+export const rewardSavings = mutation({
+    args: {
+        studentId: v.id("students"),
+        goalId: v.id("savingsGoals"),
+        amount: v.number(),
+        message: v.optional(v.string()),
+    },
+    handler: async (ctx, args) => {
+        const goal = await ctx.db.get(args.goalId);
+        if (!goal) throw new Error("Meta de ahorro no encontrada");
+
+        await ctx.db.patch(args.goalId, {
+            currentAmount: goal.currentAmount + args.amount,
+        });
+
+        await ctx.db.insert("transactions", {
+            studentId: args.studentId,
+            type: "premio",
+            description: args.message || "Premio de ahorro",
+            amount: args.amount,
+            balanceAfter: 0,
+            icon: "stars",
+            category: "Premio",
+        });
+    },
+});
+
+/** Approve or reject a savings goal */
+export const approveGoal = mutation({
+    args: {
+        goalId: v.id("savingsGoals"),
+        approved: v.boolean(),
+    },
+    handler: async (ctx, args) => {
+        const goal = await ctx.db.get(args.goalId);
+        if (!goal) throw new Error("Meta no encontrada");
+
+        await ctx.db.patch(args.goalId, {
+            active: args.approved,
+        });
+
+        return { success: true };
+    },
+});
+
+/** Mark a notification as read */
+export const markNotificationRead = mutation({
+    args: { notificationId: v.id("notifications") },
+    handler: async (ctx, args) => {
+        await ctx.db.patch(args.notificationId, { read: true });
+    },
+});
+
+/** Mark all notifications as read */
+export const markAllNotificationsRead = mutation({
+    args: {},
+    handler: async (ctx) => {
+        const resolved = await resolveParent(ctx);
+        if (!resolved) throw new Error("No autenticado o perfil de padre no encontrado");
+
+        const notifications = await ctx.db
+            .query("notifications")
+            .withIndex("by_userId", (q) => q.eq("userId", resolved.user._id))
+            .collect();
+
+        await Promise.all(
+            notifications
+                .filter((n) => !n.read)
+                .map((n) => ctx.db.patch(n._id, { read: true }))
+        );
+    },
+});
+
 /** Create a new subscription */
 export const createSubscription = mutation({
     args: {
@@ -679,51 +508,15 @@ export const createSubscription = mutation({
         items: v.array(v.string()),
     },
     handler: async (ctx, args) => {
-        const identity = await ctx.auth.getUserIdentity();
-        if (!identity) throw new Error("No autenticado");
-
-        let authEmail = identity.email;
-        if (!authEmail) {
-            const authAccounts = await ctx.db.query("authAccounts").collect();
-            for (const account of authAccounts) {
-                if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
-                    authEmail = account.providerAccountId;
-                    break;
-                }
-            }
-        }
-
-        let user = null;
-        let _parentProfile = null;
-        if (authEmail) {
-            const usersWithEmail = await ctx.db
-                .query("users")
-                .filter((q) => q.eq(q.field("email"), authEmail))
-                .collect();
-            
-            for (const u of usersWithEmail) {
-                const p = await ctx.db
-                    .query("parents")
-                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
-                    .first();
-                if (p) {
-                    user = u;
-                    _parentProfile = p;
-                    break;
-                }
-            }
-        }
-        if (!user) throw new Error("Usuario no encontrado");
-
-        const parent = _parentProfile;
-        if (!parent) throw new Error("Perfil de padre no encontrado");
+        const resolved = await resolveParent(ctx);
+        if (!resolved) throw new Error("No autenticado o perfil de padre no encontrado");
 
         const nextDelivery = new Date();
         nextDelivery.setDate(nextDelivery.getDate() + 1);
 
         await ctx.db.insert("subscriptions", {
             studentId: args.studentId,
-            parentId: parent._id,
+            parentId: resolved.parent._id,
             planName: args.planName,
             price: args.price,
             status: "active",
@@ -741,5 +534,27 @@ export const cancelSubscription = mutation({
     handler: async (ctx, args) => {
         await ctx.db.patch(args.subscriptionId, { status: "canceled" });
         return { success: true };
+    },
+});
+
+/** Save incentive config (match percentage) for a child */
+export const saveIncentiveConfig = mutation({
+    args: {
+        studentId: v.id("students"),
+        matchPercent: v.number(),
+    },
+    handler: async (ctx, args) => {
+        const resolved = await resolveParent(ctx);
+        if (!resolved) throw new Error("No autenticado o perfil de padre no encontrado");
+
+        await ctx.db.insert("notifications", {
+            userId: resolved.user._id,
+            title: "Incentivo configurado",
+            message: `Match de ahorro configurado al ${args.matchPercent}% para el estudiante.`,
+            read: true,
+            type: "incentive_config",
+        });
+
+        return { success: true, matchPercent: args.matchPercent };
     },
 });

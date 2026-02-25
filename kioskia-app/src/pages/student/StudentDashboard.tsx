@@ -4,9 +4,9 @@ import { useStudentProfile, useSavingsGoal, useTransactions, useSpendingSummary 
 
 export default function StudentDashboard() {
     const profile = useStudentProfile()
-    const savingsGoal = useSavingsGoal()
-    const transactions = useTransactions({ limit: 8 })
-    const summary = useSpendingSummary()
+    const savingsGoal = useSavingsGoal(profile?._id)
+    const transactions = useTransactions({ studentId: profile?._id, limit: 8 })
+    const summary = useSpendingSummary(profile?._id)
     const [showError, setShowError] = useState(false)
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 

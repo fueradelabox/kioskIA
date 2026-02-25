@@ -4,7 +4,7 @@ import type { Id } from '../../convex/_generated/dataModel'
 
 /** Fetch parent's children */
 export function useChildren() {
-    return useQuery(api.parents.getChildren) ?? []
+    return useQuery(api.parents.getChildren)
 }
 
 /** Fetch child dashboard */
@@ -45,7 +45,7 @@ export function useCreateDeposit() {
 
 /** Get deposits */
 export function useDeposits() {
-    return useQuery(api.parents.getDeposits) ?? []
+    return useQuery(api.parents.getDeposits)
 }
 
 /** Reward savings */
@@ -78,7 +78,7 @@ export function useMonthlyAnalysis(studentId: Id<"students"> | null) {
 
 /** Fetch notifications for parent */
 export function useNotifications() {
-    return useQuery(api.parents.getNotifications) ?? []
+    return useQuery(api.parents.getNotifications)
 }
 
 /** Mark notification as read */
@@ -107,4 +107,9 @@ export function useCreateSubscription() {
 /** Cancel a subscription */
 export function useCancelSubscription() {
     return useMutation(api.parents.cancelSubscription)
+}
+
+/** Save incentive config */
+export function useSaveIncentiveConfig() {
+    return useMutation(api.parents.saveIncentiveConfig)
 }

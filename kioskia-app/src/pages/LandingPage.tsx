@@ -116,9 +116,14 @@ export default function LandingPage() {
                     </div>
                 </main>
 
-                {/* Footer */}
-                <footer className="py-6 text-center text-sm text-gray-400 dark:text-gray-500">
+                <footer className="py-6 flex flex-col items-center justify-center gap-2 text-sm text-gray-400 dark:text-gray-500">
                     <p>© 2026 KioskIA · Educación financiera y alimentación consciente</p>
+                    <button
+                        onClick={() => navigate('/admin')}
+                        className="text-xs hover:text-primary transition-colors mt-2"
+                    >
+                        Panel de Administración
+                    </button>
                 </footer>
             </div>
         </>

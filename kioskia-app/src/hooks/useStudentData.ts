@@ -18,11 +18,11 @@ export function useTransactions(opts?: {
     filterType?: "compra" | "recarga" | "ahorro" | "premio"
     limit?: number
 }) {
-    return useQuery(api.students.getTransactions, {
-        studentId: opts?.studentId,
-        filterType: opts?.filterType,
-        limit: opts?.limit,
-    }) ?? []
+    return useQuery(api.students.getTransactions, opts?.studentId ? {
+        studentId: opts.studentId,
+        filterType: opts.filterType,
+        limit: opts.limit,
+    } : "skip") ?? []
 }
 
 /** Create a savings goal */

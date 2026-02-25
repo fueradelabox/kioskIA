@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import type { ChildContext } from './ParentLayout'
-import { useChildDashboard } from '../../hooks/useParentData'
+import { useChildDashboard, useSaveIncentiveConfig } from '../../hooks/useParentData'
 import type { Id } from '../../../convex/_generated/dataModel'
 
 export default function IncentivesConfig() {
     const { activeChildId } = useOutletContext<ChildContext>()
     const dashboardData = useChildDashboard(activeChildId as Id<"students"> | null)
+    const saveIncentiveConfig = useSaveIncentiveConfig()
     const student = dashboardData?.student
     const savingsGoal = dashboardData?.savingsGoal
     const loading = dashboardData === undefined
     const [matchPercent, setMatchPercent] = useState(50)
     const [saved, setSaved] = useState(false)
+    const [saving, setSaving] = useState(false)
 
     if (loading) {
         return (
@@ -21,10 +23,20 @@ export default function IncentivesConfig() {
         )
     }
 
-    const handleSave = () => {
-        // In production, this would call a mutation to store the config
-        setSaved(true)
-        setTimeout(() => setSaved(false), 2000)
+    const handleSave = async () => {
+        if (!activeChildId) return
+        setSaving(true)
+        try {
+            await saveIncentiveConfig({
+                studentId: activeChildId as Id<"students">,
+                matchPercent,
+            })
+            setSaved(true)
+            setTimeout(() => setSaved(false), 2000)
+        } catch (err) {
+            console.error('Error guardando configuración:', err)
+        }
+        setSaving(false)
     }
 
     const currentSaved = savingsGoal?.currentAmount ?? 0
@@ -138,10 +150,13 @@ export default function IncentivesConfig() {
             <div className="animate-slide-up" style={{ animationDelay: '400ms' }}>
                 <button
                     onClick={handleSave}
-                    className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold py-4 rounded-2xl shadow-lg hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                    disabled={saving || !activeChildId}
+                    className="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold py-4 rounded-2xl shadow-lg hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
                 >
                     {saved ? (
                         <><span className="material-icons-round">check_circle</span> ¡Guardado!</>
+                    ) : saving ? (
+                        <><span className="material-icons-round animate-spin">sync</span> Guardando...</>
                     ) : (
                         <><span className="material-icons-round">save</span> Guardar Configuración</>
                     )}

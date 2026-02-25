@@ -12,8 +12,9 @@ export interface ChildContext {
 export default function ParentLayout() {
     const { darkMode } = useDarkMode()
     const { signOut } = useAuth()
-    const kids = useChildren()
-    const loading = kids.length === 0
+    const kidsData = useChildren()
+    const loading = kidsData === undefined
+    const kids = kidsData ?? []
     const [activeChildId, setActiveChildId] = useState<string | null>(null)
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 

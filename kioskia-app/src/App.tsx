@@ -29,6 +29,9 @@ import VendorDashboard from './pages/vendor/VendorDashboard'
 import VendorSuccess from './pages/vendor/VendorSuccess'
 import VendorError from './pages/vendor/VendorError'
 import LandingPage from './pages/LandingPage'
+import AdminLayout from './pages/admin/AdminLayout'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import UserManagement from './pages/admin/UserManagement'
 
 export default function App() {
   return (
@@ -73,6 +76,12 @@ export default function App() {
         </Route>
         <Route path="/vendedor/exito" element={<VendorSuccess />} />
         <Route path="/vendedor/error" element={<VendorError />} />
+
+        {/* Admin */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="usuarios" element={<UserManagement />} />
+        </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

@@ -1,6 +1,21 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function getAuthEmail(ctx: any, identity: any) {
+    let email = identity.email;
+    if (!email) {
+        const authAccounts = await ctx.db.query("authAccounts").collect();
+        for (const account of authAccounts) {
+            if (String(account.userId) === identity.subject || identity.tokenIdentifier?.includes(String(account.userId))) {
+                email = account.providerAccountId;
+                break;
+            }
+        }
+    }
+    return email;
+}
+
 /** Get the logged-in student's profile */
 export const getProfile = query({
     args: {},
@@ -229,9 +244,12 @@ export const createSavingsGoal = mutation({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("No autenticado");
 
+        const email = await getAuthEmail(ctx, identity);
+        if (!email) throw new Error("Usuario sin email configurado");
+
         const user = await ctx.db
             .query("users")
-            .filter((q) => q.eq(q.field("email"), identity.email))
+            .filter((q) => q.eq(q.field("email"), email))
             .first();
         if (!user) throw new Error("Usuario no encontrado");
 
@@ -262,9 +280,12 @@ export const transferToSavings = mutation({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("No autenticado");
 
+        const email = await getAuthEmail(ctx, identity);
+        if (!email) throw new Error("Usuario sin email configurado");
+
         const user = await ctx.db
             .query("users")
-            .filter((q) => q.eq(q.field("email"), identity.email))
+            .filter((q) => q.eq(q.field("email"), email))
             .first();
         if (!user) throw new Error("Usuario no encontrado");
 
@@ -313,9 +334,12 @@ export const updateProfile = mutation({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) throw new Error("No autenticado");
 
+        const email = await getAuthEmail(ctx, identity);
+        if (!email) throw new Error("Usuario sin email configurado");
+
         const user = await ctx.db
             .query("users")
-            .filter((q) => q.eq(q.field("email"), identity.email))
+            .filter((q) => q.eq(q.field("email"), email))
             .first();
         if (!user) throw new Error("Usuario no encontrado");
 

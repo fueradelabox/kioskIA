@@ -7,7 +7,7 @@ import type { Id } from '../../../convex/_generated/dataModel'
 export default function ParentDashboard() {
     const { activeChildId } = useOutletContext<ChildContext>()
     const dashboardData = useChildDashboard(activeChildId as Id<"students"> | null)
-    const loading = dashboardData === undefined
+    const loading = activeChildId ? dashboardData === undefined : false
     const student = dashboardData?.student ?? null
     const transactions = dashboardData?.transactions ?? []
     const savingsGoal = dashboardData?.savingsGoal ?? null
@@ -40,7 +40,7 @@ export default function ParentDashboard() {
         )
     }
 
-    const totalBalance = student.generalBalance + student.healthyBalance
+    const totalBalance = (student.generalBalance || 0) + (student.healthyBalance || 0)
 
     const handleRecharge = async () => {
         const amount = Number(rechargeAmount)
@@ -109,11 +109,11 @@ export default function ParentDashboard() {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4">
                                 <p className="text-[10px] text-white/60 uppercase tracking-widest font-bold">Saludable</p>
-                                <p className="text-xl font-bold">${student.healthyBalance.toLocaleString('es-CL')}</p>
+                                <p className="text-xl font-bold">${(student.healthyBalance || 0).toLocaleString('es-CL')}</p>
                             </div>
                             <div className="bg-white/15 backdrop-blur-sm rounded-xl p-4">
                                 <p className="text-[10px] text-white/60 uppercase tracking-widest font-bold">General Libre</p>
-                                <p className="text-xl font-bold">${student.generalBalance.toLocaleString('es-CL')}</p>
+                                <p className="text-xl font-bold">${(student.generalBalance || 0).toLocaleString('es-CL')}</p>
                             </div>
                         </div>
                     </div>
