@@ -1,13 +1,22 @@
+import { useState } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useDarkMode } from '../../context/DarkModeContext'
 import { useStudentProfile } from '../../hooks/useStudentData'
 import { useAuth } from '../../context/AuthContext'
 
-const navItems = [
+const primaryNavItems = [
     { path: '/estudiante', icon: 'home', label: 'Inicio', end: true },
     { path: '/estudiante/ahorro/crear', icon: 'savings', label: 'Mi Ahorro', end: false },
     { path: '/estudiante/historial', icon: 'history', label: 'Historial', end: false },
     { path: '/estudiante/perfil', icon: 'person', label: 'Perfil', end: false },
+]
+
+const explorerNavItems = [
+    { path: '/estudiante/educacion', icon: 'school', label: 'Educación', end: false },
+    { path: '/estudiante/test', icon: 'quiz', label: 'Test', end: false },
+    { path: '/estudiante/logros', icon: 'emoji_events', label: 'Logros', end: false },
+    { path: '/estudiante/planificador', icon: 'restaurant', label: 'Planificador', end: false },
+    { path: '/estudiante/resumen', icon: 'auto_awesome', label: 'Resumen', end: false },
 ]
 
 export default function StudentLayout() {
@@ -15,6 +24,7 @@ export default function StudentLayout() {
     const { darkMode, toggleDarkMode } = useDarkMode()
     const { signOut } = useAuth()
     const student = useStudentProfile()
+    const [moreMenuOpen, setMoreMenuOpen] = useState(false)
 
     // Dynamic student data with fallbacks
     const initials = student?.avatarInitials || student?.fullName?.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || '?'
@@ -36,8 +46,8 @@ export default function StudentLayout() {
                     </span>
                 </div>
 
-                <nav className="flex-1 px-4 space-y-1.5 mt-4">
-                    {navItems.map((item) => (
+                <nav className="flex-1 px-4 space-y-1.5 mt-4 overflow-y-auto">
+                    {primaryNavItems.map((item) => (
                         <NavLink
                             key={item.path}
                             to={item.path}
@@ -53,6 +63,29 @@ export default function StudentLayout() {
                             <span className="font-medium">{item.label}</span>
                         </NavLink>
                     ))}
+
+                    {/* Explorar Section */}
+                    <div className="pt-3 mt-3 border-t border-gray-100 dark:border-gray-700">
+                        <p className="px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                            Explorar
+                        </p>
+                        {explorerNavItems.map((item) => (
+                            <NavLink
+                                key={item.path}
+                                to={item.path}
+                                end={item.end}
+                                className={({ isActive }) =>
+                                    `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all ${isActive
+                                        ? 'bg-primary/10 text-primary font-medium'
+                                        : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                    }`
+                                }
+                            >
+                                <span className="material-icons-round text-[20px]">{item.icon}</span>
+                                <span className="font-medium text-sm">{item.label}</span>
+                            </NavLink>
+                        ))}
+                    </div>
                 </nav>
 
                 {/* Dark mode toggle */}
@@ -123,14 +156,50 @@ export default function StudentLayout() {
                 </div>
             </main>
 
+            {/* Mobile "More" Menu Overlay */}
+            {moreMenuOpen && (
+                <div
+                    className="md:hidden fixed inset-0 bg-black/40 z-40 transition-opacity"
+                    onClick={() => setMoreMenuOpen(false)}
+                />
+            )}
+            {moreMenuOpen && (
+                <div className="md:hidden fixed bottom-16 left-0 right-0 z-50 bg-white dark:bg-surface-dark border-t border-gray-200 dark:border-gray-700 rounded-t-2xl shadow-xl animate-slide-up pb-safe">
+                    <div className="flex justify-center pt-2 pb-1">
+                        <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
+                    </div>
+                    <p className="px-5 py-2 text-[11px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                        Explorar
+                    </p>
+                    <div className="grid grid-cols-3 gap-1 px-4 pb-4">
+                        {explorerNavItems.map((item) => (
+                            <NavLink
+                                key={item.path}
+                                to={item.path}
+                                end={item.end}
+                                onClick={() => setMoreMenuOpen(false)}
+                                className={({ isActive }) =>
+                                    `flex flex-col items-center gap-1 py-3 px-2 rounded-xl transition-colors ${isActive ? 'bg-primary/10 text-primary' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                    }`
+                                }
+                            >
+                                <span className="material-icons-round text-2xl">{item.icon}</span>
+                                <span className="text-[10px] font-medium">{item.label}</span>
+                            </NavLink>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {/* Mobile Bottom Navigation */}
             <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-surface-dark border-t border-gray-200 dark:border-gray-700 pb-safe z-40">
                 <div className="flex justify-around items-center h-16">
-                    {navItems.map((item) => (
+                    {primaryNavItems.map((item) => (
                         <NavLink
                             key={item.path}
                             to={item.path}
                             end={item.end}
+                            onClick={() => setMoreMenuOpen(false)}
                             className={({ isActive }) =>
                                 `flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg transition-colors ${isActive ? 'text-primary' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
                                 }`
@@ -140,6 +209,15 @@ export default function StudentLayout() {
                             <span className="text-[10px] font-medium">{item.label}</span>
                         </NavLink>
                     ))}
+                    {/* More button */}
+                    <button
+                        onClick={() => setMoreMenuOpen(prev => !prev)}
+                        className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-lg transition-colors ${moreMenuOpen ? 'text-primary' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                            }`}
+                    >
+                        <span className="material-icons-round text-xl">{moreMenuOpen ? 'close' : 'apps'}</span>
+                        <span className="text-[10px] font-medium">Más</span>
+                    </button>
                 </div>
             </nav>
         </div>

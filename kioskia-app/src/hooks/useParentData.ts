@@ -52,3 +52,59 @@ export function useDeposits() {
 export function useRewardSavings() {
     return useMutation(api.parents.rewardSavings)
 }
+
+// ─── GROUP 2: NEW HOOKS ───────────────────────────
+
+/** Fetch child savings goals */
+export function useChildSavingsGoals(studentId: Id<"students"> | null) {
+    return useQuery(
+        api.parents.getChildSavingsGoals,
+        studentId ? { studentId } : "skip"
+    )
+}
+
+/** Approve or reject a savings goal */
+export function useApproveGoal() {
+    return useMutation(api.parents.approveGoal)
+}
+
+/** Fetch monthly analysis for a child */
+export function useMonthlyAnalysis(studentId: Id<"students"> | null) {
+    return useQuery(
+        api.parents.getMonthlyAnalysis,
+        studentId ? { studentId } : "skip"
+    )
+}
+
+/** Fetch notifications for parent */
+export function useNotifications() {
+    return useQuery(api.parents.getNotifications) ?? []
+}
+
+/** Mark notification as read */
+export function useMarkNotificationRead() {
+    return useMutation(api.parents.markNotificationRead)
+}
+
+/** Mark all notifications as read */
+export function useMarkAllNotificationsRead() {
+    return useMutation(api.parents.markAllNotificationsRead)
+}
+
+/** Fetch subscriptions for a child */
+export function useSubscriptions(studentId: Id<"students"> | null) {
+    return useQuery(
+        api.parents.getSubscriptions,
+        studentId ? { studentId } : "skip"
+    )
+}
+
+/** Create a subscription */
+export function useCreateSubscription() {
+    return useMutation(api.parents.createSubscription)
+}
+
+/** Cancel a subscription */
+export function useCancelSubscription() {
+    return useMutation(api.parents.cancelSubscription)
+}

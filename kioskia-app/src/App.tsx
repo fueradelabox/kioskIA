@@ -17,6 +17,11 @@ import ParentLayout from './pages/parent/ParentLayout'
 import ParentDashboard from './pages/parent/ParentDashboard'
 import ParentLimits from './pages/parent/ParentLimits'
 import ParentDeposit from './pages/parent/ParentDeposit'
+import GoalApproval from './pages/parent/GoalApproval'
+import IncentivesConfig from './pages/parent/IncentivesConfig'
+import MonthlyAnalysis from './pages/parent/MonthlyAnalysis'
+import NotificationCenter from './pages/parent/NotificationCenter'
+import SnackSubscription from './pages/parent/SnackSubscription'
 import VendorLogin from './pages/vendor/VendorLogin'
 import VendorLayout from './pages/vendor/VendorLayout'
 import VendorPOS from './pages/vendor/VendorPOS'
@@ -53,6 +58,11 @@ export default function App() {
           <Route index element={<ParentDashboard />} />
           <Route path="depositos" element={<ParentDeposit />} />
           <Route path="limites" element={<ParentLimits />} />
+          <Route path="metas" element={<GoalApproval />} />
+          <Route path="incentivos" element={<IncentivesConfig />} />
+          <Route path="analisis" element={<MonthlyAnalysis />} />
+          <Route path="notificaciones" element={<NotificationCenter />} />
+          <Route path="suscripciones" element={<SnackSubscription />} />
         </Route>
 
         {/* Vendor */}

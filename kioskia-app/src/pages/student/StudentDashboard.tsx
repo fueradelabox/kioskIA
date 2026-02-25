@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { useStudentProfile, useSavingsGoal, useTransactions, useSpendingSummary } from '../../hooks/useStudentData'
 
 export default function StudentDashboard() {
@@ -175,33 +176,33 @@ export default function StudentDashboard() {
                     Explora tu Mundo
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
-                    <a href="/estudiante/educacion" className="bg-gradient-to-br from-yellow-300 to-orange-400 p-4 rounded-2xl text-white shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
+                    <Link to="/estudiante/educacion" className="bg-gradient-to-br from-yellow-300 to-orange-400 p-4 rounded-2xl text-white shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
                         <div className="absolute -right-2 -top-2 text-white/20">
                             <span className="material-icons-round" style={{ fontSize: '4rem' }}>school</span>
                         </div>
                         <p className="font-black text-lg leading-tight relative z-10">Aventura<br />Financiera</p>
-                    </a>
+                    </Link>
 
-                    <a href="/estudiante/planificador" className="bg-gradient-to-br from-green-400 to-emerald-500 p-4 rounded-2xl text-white shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
+                    <Link to="/estudiante/planificador" className="bg-gradient-to-br from-green-400 to-emerald-500 p-4 rounded-2xl text-white shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
                         <div className="absolute -right-2 -top-2 text-white/20">
                             <span className="material-icons-round" style={{ fontSize: '4rem' }}>restaurant</span>
                         </div>
                         <p className="font-black text-lg leading-tight relative z-10">Arma tu<br />Combo</p>
-                    </a>
+                    </Link>
 
-                    <a href="/estudiante/logros" className="bg-gradient-to-br from-purple-400 to-pink-500 p-4 rounded-2xl text-white shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
+                    <Link to="/estudiante/logros" className="bg-gradient-to-br from-purple-400 to-pink-500 p-4 rounded-2xl text-white shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
                         <div className="absolute -right-2 -top-2 text-white/20">
                             <span className="material-icons-round" style={{ fontSize: '4rem' }}>emoji_events</span>
                         </div>
                         <p className="font-black text-lg leading-tight relative z-10">Mis<br />Medallas</p>
-                    </a>
+                    </Link>
 
-                    <a href="/estudiante/resumen" className="bg-gradient-to-br from-blue-400 to-indigo-500 p-4 rounded-2xl text-white shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
+                    <Link to="/estudiante/resumen" className="bg-gradient-to-br from-blue-400 to-indigo-500 p-4 rounded-2xl text-white shadow-sm hover:-translate-y-1 transition-transform relative overflow-hidden">
                         <div className="absolute -right-2 -top-2 text-white/20">
                             <span className="material-icons-round" style={{ fontSize: '4rem' }}>auto_awesome</span>
                         </div>
                         <p className="font-black text-lg leading-tight relative z-10">Año<br />Épico</p>
-                    </a>
+                    </Link>
                 </div>
             </div>
 
@@ -212,9 +213,9 @@ export default function StudentDashboard() {
                         <span className="material-icons-round text-primary text-xl">receipt_long</span>
                         Últimos Movimientos
                     </h3>
-                    <a href="/estudiante/historial" className="text-xs font-bold text-primary hover:text-primary-dark transition-colors">
+                    <Link to="/estudiante/historial" className="text-xs font-bold text-primary hover:text-primary-dark transition-colors">
                         Ver todo →
-                    </a>
+                    </Link>
                 </div>
                 <div className="divide-y divide-gray-100 dark:divide-gray-800">
                     {transactions.length === 0 && (

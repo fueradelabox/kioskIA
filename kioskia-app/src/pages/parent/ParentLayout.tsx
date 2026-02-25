@@ -97,6 +97,34 @@ export default function ParentLayout() {
                         <span className="material-icons-round text-xl">tune</span>
                         Límites
                     </NavLink>
+
+                    <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold pt-4 pb-2 px-4">Herramientas</p>
+
+                    <NavLink to="/padre/metas" className={({ isActive }) =>
+                        `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive ? 'bg-primary/10 text-primary font-bold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
+                        <span className="material-icons-round text-xl">flag</span>
+                        Metas
+                    </NavLink>
+                    <NavLink to="/padre/incentivos" className={({ isActive }) =>
+                        `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive ? 'bg-primary/10 text-primary font-bold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
+                        <span className="material-icons-round text-xl">emoji_events</span>
+                        Incentivos
+                    </NavLink>
+                    <NavLink to="/padre/analisis" className={({ isActive }) =>
+                        `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive ? 'bg-primary/10 text-primary font-bold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
+                        <span className="material-icons-round text-xl">analytics</span>
+                        Análisis
+                    </NavLink>
+                    <NavLink to="/padre/notificaciones" className={({ isActive }) =>
+                        `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive ? 'bg-primary/10 text-primary font-bold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
+                        <span className="material-icons-round text-xl">notifications</span>
+                        Notificaciones
+                    </NavLink>
+                    <NavLink to="/padre/suscripciones" className={({ isActive }) =>
+                        `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${isActive ? 'bg-primary/10 text-primary font-bold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}>
+                        <span className="material-icons-round text-xl">restaurant</span>
+                        Colaciones
+                    </NavLink>
                 </nav>
 
                 <button onClick={handleSignOut} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-danger hover:bg-danger/5 rounded-xl transition-colors mt-auto">
@@ -141,6 +169,21 @@ export default function ParentLayout() {
                         </NavLink>
                         <NavLink to="/padre/limites" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
                             <span className="material-icons-round">tune</span> Límites
+                        </NavLink>
+                        <NavLink to="/padre/metas" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <span className="material-icons-round">flag</span> Metas
+                        </NavLink>
+                        <NavLink to="/padre/incentivos" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <span className="material-icons-round">emoji_events</span> Incentivos
+                        </NavLink>
+                        <NavLink to="/padre/analisis" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <span className="material-icons-round">analytics</span> Análisis
+                        </NavLink>
+                        <NavLink to="/padre/notificaciones" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <span className="material-icons-round">notifications</span> Notificaciones
+                        </NavLink>
+                        <NavLink to="/padre/suscripciones" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                            <span className="material-icons-round">restaurant</span> Colaciones
                         </NavLink>
                         <button onClick={handleSignOut} className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium text-danger w-full">
                             <span className="material-icons-round">logout</span> Cerrar Sesión

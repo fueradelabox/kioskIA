@@ -45,10 +45,6 @@ export default function LandingPage() {
 
     return (
         <>
-            {/* TEMP DEBUG - remove after fixing */}
-            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, background: '#000', color: '#0f0', padding: '8px 16px', fontSize: '12px', fontFamily: 'monospace' }}>
-                AUTH: {isAuthenticated ? '✅ YES' : '❌ NO'} | LOADING: {isLoading ? '⏳ YES' : '✅ NO'} | ROLE: {role || 'null'} | HASH: {typeof window !== 'undefined' ? window.location.hash.substring(0, 30) : 'ssr'}
-            </div>
             <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary/5 dark:from-gray-950 dark:via-gray-900 dark:to-primary/10 flex flex-col">
                 {/* Header */}
                 <header className="w-full px-6 py-4 flex justify-between items-center max-w-6xl mx-auto">
