@@ -20,7 +20,7 @@ export const getChildren = query({
         }
 
         let user = null;
-        let parentProfile = null;
+        let _parentProfile = null;
         if (authEmail) {
             const usersWithEmail = await ctx.db
                 .query("users")
@@ -34,14 +34,14 @@ export const getChildren = query({
                     .first();
                 if (p) {
                     user = u;
-                    parentProfile = p;
+                    _parentProfile = p;
                     break;
                 }
             }
         }
         if (!user) return [];
 
-        const parent = parentProfile;
+        const parent = _parentProfile;
         if (!parent) return [];
 
         const links = await ctx.db
@@ -159,7 +159,7 @@ export const getProfile = query({
         }
 
         let user = null;
-        let parentProfile = null;
+        let _parentProfile = null;
         if (authEmail) {
             const usersWithEmail = await ctx.db
                 .query("users")
@@ -173,7 +173,7 @@ export const getProfile = query({
                     .first();
                 if (p) {
                     user = u;
-                    parentProfile = p;
+                    _parentProfile = p;
                     break;
                 }
             }
@@ -210,7 +210,7 @@ export const updateConsumptionLimit = mutation({
         }
 
         let user = null;
-        let parentProfile = null;
+        let _parentProfile = null;
         if (authEmail) {
             const usersWithEmail = await ctx.db
                 .query("users")
@@ -224,14 +224,14 @@ export const updateConsumptionLimit = mutation({
                     .first();
                 if (p) {
                     user = u;
-                    parentProfile = p;
+                    _parentProfile = p;
                     break;
                 }
             }
         }
         if (!user) throw new Error("Usuario no encontrado");
 
-        const parent = parentProfile;
+        const parent = _parentProfile;
         if (!parent) throw new Error("Perfil de padre no encontrado");
 
         const existing = await ctx.db
@@ -314,7 +314,7 @@ export const createDeposit = mutation({
         }
 
         let user = null;
-        let parentProfile = null;
+        let _parentProfile = null;
         if (authEmail) {
             const usersWithEmail = await ctx.db
                 .query("users")
@@ -328,14 +328,14 @@ export const createDeposit = mutation({
                     .first();
                 if (p) {
                     user = u;
-                    parentProfile = p;
+                    _parentProfile = p;
                     break;
                 }
             }
         }
         if (!user) throw new Error("Usuario no encontrado");
 
-        const parent = parentProfile;
+        const parent = _parentProfile;
         if (!parent) throw new Error("Perfil de padre no encontrado");
 
         // Create the deposit record
@@ -396,7 +396,7 @@ export const getDeposits = query({
         }
 
         let user = null;
-        let parentProfile = null;
+        let _parentProfile = null;
         if (authEmail) {
             const usersWithEmail = await ctx.db
                 .query("users")
@@ -410,14 +410,14 @@ export const getDeposits = query({
                     .first();
                 if (p) {
                     user = u;
-                    parentProfile = p;
+                    _parentProfile = p;
                     break;
                 }
             }
         }
         if (!user) return [];
 
-        const parent = parentProfile;
+        const parent = _parentProfile;
         if (!parent) return [];
 
         return await ctx.db
@@ -568,7 +568,7 @@ export const getNotifications = query({
         }
 
         let user = null;
-        let parentProfile = null;
+        let _parentProfile = null;
         if (authEmail) {
             const usersWithEmail = await ctx.db
                 .query("users")
@@ -582,7 +582,7 @@ export const getNotifications = query({
                     .first();
                 if (p) {
                     user = u;
-                    parentProfile = p;
+                    _parentProfile = p;
                     break;
                 }
             }
@@ -624,7 +624,7 @@ export const markAllNotificationsRead = mutation({
         }
 
         let user = null;
-        let parentProfile = null;
+        let _parentProfile = null;
         if (authEmail) {
             const usersWithEmail = await ctx.db
                 .query("users")
@@ -638,7 +638,7 @@ export const markAllNotificationsRead = mutation({
                     .first();
                 if (p) {
                     user = u;
-                    parentProfile = p;
+                    _parentProfile = p;
                     break;
                 }
             }
@@ -694,7 +694,7 @@ export const createSubscription = mutation({
         }
 
         let user = null;
-        let parentProfile = null;
+        let _parentProfile = null;
         if (authEmail) {
             const usersWithEmail = await ctx.db
                 .query("users")
@@ -708,14 +708,14 @@ export const createSubscription = mutation({
                     .first();
                 if (p) {
                     user = u;
-                    parentProfile = p;
+                    _parentProfile = p;
                     break;
                 }
             }
         }
         if (!user) throw new Error("Usuario no encontrado");
 
-        const parent = parentProfile;
+        const parent = _parentProfile;
         if (!parent) throw new Error("Perfil de padre no encontrado");
 
         const nextDelivery = new Date();
