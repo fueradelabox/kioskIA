@@ -19,16 +19,29 @@ export const getChildren = query({
             }
         }
 
-        const user = authEmail ? await ctx.db
-            .query("users")
-            .filter((q) => q.eq(q.field("email"), authEmail))
-            .first() : null;
+        let user = null;
+        let parentProfile = null;
+        if (authEmail) {
+            const usersWithEmail = await ctx.db
+                .query("users")
+                .filter((q) => q.eq(q.field("email"), authEmail))
+                .collect();
+            
+            for (const u of usersWithEmail) {
+                const p = await ctx.db
+                    .query("parents")
+                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
+                    .first();
+                if (p) {
+                    user = u;
+                    parentProfile = p;
+                    break;
+                }
+            }
+        }
         if (!user) return [];
 
-        const parent = await ctx.db
-            .query("parents")
-            .withIndex("by_userId", (q) => q.eq("userId", user._id))
-            .first();
+        const parent = parentProfile;
         if (!parent) return [];
 
         const links = await ctx.db
@@ -145,10 +158,26 @@ export const getProfile = query({
             }
         }
 
-        const user = authEmail ? await ctx.db
-            .query("users")
-            .filter((q) => q.eq(q.field("email"), authEmail))
-            .first() : null;
+        let user = null;
+        let parentProfile = null;
+        if (authEmail) {
+            const usersWithEmail = await ctx.db
+                .query("users")
+                .filter((q) => q.eq(q.field("email"), authEmail))
+                .collect();
+            
+            for (const u of usersWithEmail) {
+                const p = await ctx.db
+                    .query("parents")
+                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
+                    .first();
+                if (p) {
+                    user = u;
+                    parentProfile = p;
+                    break;
+                }
+            }
+        }
         if (!user) return null;
 
         return await ctx.db
@@ -180,16 +209,29 @@ export const updateConsumptionLimit = mutation({
             }
         }
 
-        const user = authEmail ? await ctx.db
-            .query("users")
-            .filter((q) => q.eq(q.field("email"), authEmail))
-            .first() : null;
+        let user = null;
+        let parentProfile = null;
+        if (authEmail) {
+            const usersWithEmail = await ctx.db
+                .query("users")
+                .filter((q) => q.eq(q.field("email"), authEmail))
+                .collect();
+            
+            for (const u of usersWithEmail) {
+                const p = await ctx.db
+                    .query("parents")
+                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
+                    .first();
+                if (p) {
+                    user = u;
+                    parentProfile = p;
+                    break;
+                }
+            }
+        }
         if (!user) throw new Error("Usuario no encontrado");
 
-        const parent = await ctx.db
-            .query("parents")
-            .withIndex("by_userId", (q) => q.eq("userId", user._id))
-            .first();
+        const parent = parentProfile;
         if (!parent) throw new Error("Perfil de padre no encontrado");
 
         const existing = await ctx.db
@@ -271,16 +313,29 @@ export const createDeposit = mutation({
             }
         }
 
-        const user = authEmail ? await ctx.db
-            .query("users")
-            .filter((q) => q.eq(q.field("email"), authEmail))
-            .first() : null;
+        let user = null;
+        let parentProfile = null;
+        if (authEmail) {
+            const usersWithEmail = await ctx.db
+                .query("users")
+                .filter((q) => q.eq(q.field("email"), authEmail))
+                .collect();
+            
+            for (const u of usersWithEmail) {
+                const p = await ctx.db
+                    .query("parents")
+                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
+                    .first();
+                if (p) {
+                    user = u;
+                    parentProfile = p;
+                    break;
+                }
+            }
+        }
         if (!user) throw new Error("Usuario no encontrado");
 
-        const parent = await ctx.db
-            .query("parents")
-            .withIndex("by_userId", (q) => q.eq("userId", user._id))
-            .first();
+        const parent = parentProfile;
         if (!parent) throw new Error("Perfil de padre no encontrado");
 
         // Create the deposit record
@@ -340,16 +395,29 @@ export const getDeposits = query({
             }
         }
 
-        const user = authEmail ? await ctx.db
-            .query("users")
-            .filter((q) => q.eq(q.field("email"), authEmail))
-            .first() : null;
+        let user = null;
+        let parentProfile = null;
+        if (authEmail) {
+            const usersWithEmail = await ctx.db
+                .query("users")
+                .filter((q) => q.eq(q.field("email"), authEmail))
+                .collect();
+            
+            for (const u of usersWithEmail) {
+                const p = await ctx.db
+                    .query("parents")
+                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
+                    .first();
+                if (p) {
+                    user = u;
+                    parentProfile = p;
+                    break;
+                }
+            }
+        }
         if (!user) return [];
 
-        const parent = await ctx.db
-            .query("parents")
-            .withIndex("by_userId", (q) => q.eq("userId", user._id))
-            .first();
+        const parent = parentProfile;
         if (!parent) return [];
 
         return await ctx.db
@@ -499,10 +567,26 @@ export const getNotifications = query({
             }
         }
 
-        const user = authEmail ? await ctx.db
-            .query("users")
-            .filter((q) => q.eq(q.field("email"), authEmail))
-            .first() : null;
+        let user = null;
+        let parentProfile = null;
+        if (authEmail) {
+            const usersWithEmail = await ctx.db
+                .query("users")
+                .filter((q) => q.eq(q.field("email"), authEmail))
+                .collect();
+            
+            for (const u of usersWithEmail) {
+                const p = await ctx.db
+                    .query("parents")
+                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
+                    .first();
+                if (p) {
+                    user = u;
+                    parentProfile = p;
+                    break;
+                }
+            }
+        }
         if (!user) return [];
 
         return await ctx.db
@@ -539,10 +623,26 @@ export const markAllNotificationsRead = mutation({
             }
         }
 
-        const user = authEmail ? await ctx.db
-            .query("users")
-            .filter((q) => q.eq(q.field("email"), authEmail))
-            .first() : null;
+        let user = null;
+        let parentProfile = null;
+        if (authEmail) {
+            const usersWithEmail = await ctx.db
+                .query("users")
+                .filter((q) => q.eq(q.field("email"), authEmail))
+                .collect();
+            
+            for (const u of usersWithEmail) {
+                const p = await ctx.db
+                    .query("parents")
+                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
+                    .first();
+                if (p) {
+                    user = u;
+                    parentProfile = p;
+                    break;
+                }
+            }
+        }
         if (!user) throw new Error("Usuario no encontrado");
 
         const notifications = await ctx.db
@@ -593,16 +693,29 @@ export const createSubscription = mutation({
             }
         }
 
-        const user = authEmail ? await ctx.db
-            .query("users")
-            .filter((q) => q.eq(q.field("email"), authEmail))
-            .first() : null;
+        let user = null;
+        let parentProfile = null;
+        if (authEmail) {
+            const usersWithEmail = await ctx.db
+                .query("users")
+                .filter((q) => q.eq(q.field("email"), authEmail))
+                .collect();
+            
+            for (const u of usersWithEmail) {
+                const p = await ctx.db
+                    .query("parents")
+                    .withIndex("by_userId", (q) => q.eq("userId", u._id))
+                    .first();
+                if (p) {
+                    user = u;
+                    parentProfile = p;
+                    break;
+                }
+            }
+        }
         if (!user) throw new Error("Usuario no encontrado");
 
-        const parent = await ctx.db
-            .query("parents")
-            .withIndex("by_userId", (q) => q.eq("userId", user._id))
-            .first();
+        const parent = parentProfile;
         if (!parent) throw new Error("Perfil de padre no encontrado");
 
         const nextDelivery = new Date();
