@@ -9,9 +9,25 @@ export const getRole = query({
         const identity = await ctx.auth.getUserIdentity();
         if (!identity) return { role: null, profileId: null };
 
+        const tokenIdentifier = identity.tokenIdentifier;
+        const subject = identity.subject;
+
+        const authAccounts = await ctx.db.query("authAccounts").collect();
+        let authEmail: string | undefined;
+
+        for (const account of authAccounts) {
+            if (String(account.userId) === subject || tokenIdentifier?.includes(String(account.userId))) {
+                authEmail = account.providerAccountId; // This is the email for resend provider
+                break;
+            }
+        }
+
+        const email = identity.email ?? authEmail;
+        if (!email) return { role: null, profileId: null };
+
         const users = await ctx.db
             .query("users")
-            .filter((q) => q.eq(q.field("email"), identity.email))
+            .filter((q) => q.eq(q.field("email"), email))
             .collect();
 
         if (users.length === 0) return { role: null, profileId: null };
