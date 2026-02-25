@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Outlet, NavLink } from 'react-router-dom'
 import { useDarkMode } from '../../context/DarkModeContext'
 import { useAuth } from '../../context/AuthContext'
 import { useChildren } from '../../hooks/useParentData'
@@ -12,7 +12,6 @@ export interface ChildContext {
 export default function ParentLayout() {
     const { darkMode } = useDarkMode()
     const { signOut } = useAuth()
-    const navigate = useNavigate()
     const kids = useChildren()
     const loading = kids.length === 0
     const [activeChildId, setActiveChildId] = useState<string | null>(null)
@@ -28,7 +27,6 @@ export default function ParentLayout() {
 
     const handleSignOut = async () => {
         await signOut()
-        navigate('/')
     }
 
     return (

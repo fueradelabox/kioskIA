@@ -25,19 +25,25 @@ export const inspectAll = query({
         // Get all students
         const students = await ctx.db.query("students").collect();
 
+        // Get all parents
+        const parents = await ctx.db.query("parents").collect();
+
+        // Get all vendors
+        const vendors = await ctx.db.query("vendors").collect();
+
         // Get auth sessions
-        let sessions: any[] = [];
+        let sessions: Record<string, unknown>[] = [];
         try {
             sessions = await ctx.db.query("authSessions").collect();
-        } catch (e) {
+        } catch {
             // table might not exist
         }
 
         // Get auth accounts
-        let accounts: any[] = [];
+        let accounts: Record<string, unknown>[] = [];
         try {
             accounts = await ctx.db.query("authAccounts").collect();
-        } catch (e) {
+        } catch {
             // table might not exist
         }
 
@@ -61,6 +67,16 @@ export const inspectAll = query({
                 userId: s.userId,
                 email: s.email,
                 fullName: s.fullName,
+            })),
+            parents: parents.map(p => ({
+                id: p._id,
+                userId: p.userId,
+                fullName: p.fullName,
+            })),
+            vendors: vendors.map(v => ({
+                id: v._id,
+                userId: v.userId,
+                businessName: v.businessName,
             })),
             sessions: sessions.length,
             accounts: accounts.map(a => ({

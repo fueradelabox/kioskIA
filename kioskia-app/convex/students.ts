@@ -51,7 +51,7 @@ export const getProfile = query({
                 return {
                     ...student,
                     email: student.email ?? email,
-                    generalBalance: student.generalBalance ?? (student as any).balance ?? 0,
+                    generalBalance: student.generalBalance ?? 0,
                     healthyBalance: student.healthyBalance ?? 0,
                     avatarInitials: student.avatarInitials ?? student.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase(),
                 };
@@ -67,7 +67,7 @@ export const getProfile = query({
             return {
                 ...studentByEmail,
                 email: studentByEmail.email ?? email,
-                generalBalance: studentByEmail.generalBalance ?? (studentByEmail as any).balance ?? 0,
+                generalBalance: studentByEmail.generalBalance ?? 0,
                 healthyBalance: studentByEmail.healthyBalance ?? 0,
                 avatarInitials: studentByEmail.avatarInitials ?? studentByEmail.fullName.split(' ').map((n: string) => n[0]).join('').toUpperCase(),
             };

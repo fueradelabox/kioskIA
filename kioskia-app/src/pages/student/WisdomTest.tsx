@@ -11,10 +11,10 @@ export default function WisdomTest() {
 
     const questions = [
         {
-            question: "Si tienes \$1.000 y compras una manzana por \$300, ¿cuánto te sobra para ahorrar?",
-            options: ["\$500", "\$700", "\$300"],
+            question: "Si tienes $1.000 y compras una manzana por $300, ¿cuánto te sobra para ahorrar?",
+            options: ["$500", "$700", "$300"],
             correctAnswer: 1, // index 1 = $700
-            explanation: "¡Correcto! \$1.000 menos \$300 es igual a \$700."
+            explanation: "¡Correcto! $1.000 menos $300 es igual a $700."
         },
         {
             question: "¿Cuál de estas opciones es una NECESIDAD?",
@@ -140,8 +140,8 @@ export default function WisdomTest() {
             {isAnswered && (
                 <div className="animate-in slide-in-from-bottom-4 duration-300">
                     <div className={`p-4 rounded-2xl mb-4 text-center font-medium ${selectedAnswer === q.correctAnswer
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
-                            : 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
+                        : 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300'
                         }`}>
                         {selectedAnswer === q.correctAnswer ? q.explanation : "Ups, piénsalo de nuevo. " + q.explanation}
                     </div>

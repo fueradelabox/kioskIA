@@ -68,7 +68,7 @@ function AuthenticatedProvider({ children }: { children: ReactNode }) {
                     localStorage.removeItem(key)
                 }
             })
-            window.location.href = '/estudiante/login'
+            window.location.href = '/'
         },
     }
 
