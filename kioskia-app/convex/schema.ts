@@ -124,6 +124,12 @@ export default defineSchema({
     setBy: v.optional(v.id("parents")),
   }).index("by_studentId", ["studentId"]),
 
+  incentiveConfigs: defineTable({
+    studentId: v.id("students"),
+    matchPercent: v.number(),
+    setBy: v.optional(v.id("parents")),
+  }).index("by_studentId", ["studentId"]),
+
   deposits: defineTable({
     parentId: v.id("parents"),
     studentId: v.id("students"),

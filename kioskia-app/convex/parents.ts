@@ -130,11 +130,17 @@ export const getChildDashboard = query({
             .withIndex("by_studentId", (q) => q.eq("studentId", args.studentId))
             .first();
 
+        const incentiveConfig = await ctx.db
+            .query("incentiveConfigs")
+            .withIndex("by_studentId", (q) => q.eq("studentId", args.studentId))
+            .first();
+
         return {
             student,
             transactions,
             savingsGoal: goals[0] ?? null,
             limit: limits,
+            incentiveConfig,
         };
     },
 });
@@ -547,11 +553,29 @@ export const saveIncentiveConfig = mutation({
         const resolved = await resolveParent(ctx);
         if (!resolved) throw new Error("No autenticado o perfil de padre no encontrado");
 
+        const existing = await ctx.db
+            .query("incentiveConfigs")
+            .withIndex("by_studentId", (q) => q.eq("studentId", args.studentId))
+            .first();
+
+        if (existing) {
+            await ctx.db.patch(existing._id, {
+                matchPercent: args.matchPercent,
+                setBy: resolved.parent._id,
+            });
+        } else {
+            await ctx.db.insert("incentiveConfigs", {
+                studentId: args.studentId,
+                matchPercent: args.matchPercent,
+                setBy: resolved.parent._id,
+            });
+        }
+
         await ctx.db.insert("notifications", {
             userId: resolved.user._id,
             title: "Incentivo configurado",
             message: `Match de ahorro configurado al ${args.matchPercent}% para el estudiante.`,
-            read: true,
+            read: false,
             type: "incentive_config",
         });
 

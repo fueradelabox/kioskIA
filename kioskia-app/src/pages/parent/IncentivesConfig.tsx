@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import type { ChildContext } from './ParentLayout'
 import { useChildDashboard, useSaveIncentiveConfig } from '../../hooks/useParentData'
@@ -14,6 +14,13 @@ export default function IncentivesConfig() {
     const [matchPercent, setMatchPercent] = useState(50)
     const [saved, setSaved] = useState(false)
     const [saving, setSaving] = useState(false)
+
+    // Sync match percent from backend once loaded
+    useEffect(() => {
+        if (dashboardData?.incentiveConfig?.matchPercent !== undefined) {
+            setMatchPercent(dashboardData.incentiveConfig.matchPercent)
+        }
+    }, [dashboardData?.incentiveConfig?.matchPercent])
 
     if (loading) {
         return (
